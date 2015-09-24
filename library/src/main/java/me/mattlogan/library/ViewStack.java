@@ -12,15 +12,15 @@ public final class ViewStack {
     private final ViewStackListener listener;
 
     public static ViewStack create(ViewGroup container) {
-        return new ViewStack(new Stack<View>(), container, ViewStackListener.DEFAULT);
+        return new ViewStack(container, ViewStackListener.DEFAULT);
     }
 
     public static ViewStack create(ViewGroup container, ViewStackListener listener) {
-        return new ViewStack(new Stack<View>(), container, listener);
+        return new ViewStack(container, listener);
     }
 
-    private ViewStack(Stack<View> stack, ViewGroup container, ViewStackListener listener) {
-        this.stack = stack;
+    private ViewStack(ViewGroup container, ViewStackListener listener) {
+        this.stack = new Stack<>();
         this.container = container;
         this.listener = listener;
     }
