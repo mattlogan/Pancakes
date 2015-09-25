@@ -6,11 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
 import me.mattlogan.library.ViewStackActivity;
 
 public class BlueView extends RelativeLayout {
 
+    public static class Factory implements ViewFactory {
+        @Override
+        public View createView(Context context) {
+            return new BlueView(context);
+        }
+    }
 
     public BlueView(final Context context) {
         super(context);

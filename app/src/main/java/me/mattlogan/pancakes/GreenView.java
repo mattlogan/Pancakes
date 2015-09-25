@@ -6,11 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
 import me.mattlogan.library.ViewStackActivity;
 
 public class GreenView extends RelativeLayout {
 
+    public static class Factory implements ViewFactory {
+        @Override
+        public View createView(Context context) {
+            return new GreenView(context);
+        }
+    }
 
     public GreenView(final Context context) {
         super(context);
@@ -29,7 +36,7 @@ public class GreenView extends RelativeLayout {
         findViewById(R.id.green_button_go_to_blue).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewStack.push(new BlueView(context, viewStack));
+                viewStack.push(new BlueView.Factory());
             }
         });
     }

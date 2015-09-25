@@ -1,48 +1,40 @@
 package me.mattlogan.library;
 
-import android.view.View;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.Stack;
 
 public final class ViewStack {
 
-    private final Stack<View> stack;
+    private static final String STACK_TAG = "stack";
+
+    private final Stack<ViewFactory> stack = new Stack<>();
     private final ViewGroup container;
-    private final ViewStackListener listener;
 
     public static ViewStack create(ViewGroup container) {
-        return new ViewStack(container, ViewStackListener.DEFAULT);
+        return new ViewStack(container);
     }
 
-    public static ViewStack create(ViewGroup container, ViewStackListener listener) {
-        return new ViewStack(container, listener);
-    }
-
-    private ViewStack(ViewGroup container, ViewStackListener listener) {
-        this.stack = new Stack<>();
+    private ViewStack(ViewGroup container) {
         this.container = container;
-        this.listener = listener;
     }
 
-    public View push(View view) {
-        stack.push(view);
+    public void push(ViewFactory viewFactory) {
+        stack.push(viewFactory);
         updateContainer();
-        listener.onViewStackChanged(stack.size());
-        return view;
     }
 
-    public View pop() {
-        boolean shouldPop = listener.onPopRequested(stack.size());
-        if (!shouldPop) return null;
-        View view = stack.pop();
+    @SuppressWarnings("all")
+    public void rebuildFromBundle(Bundle bundle) {
+        stack.addAll((Stack<ViewFactory>) bundle.getSerializable(STACK_TAG));
         updateContainer();
-        listener.onViewStackChanged(stack.size());
-        return view;
     }
 
-    public View peek() {
-        return stack.peek();
+    public void pop() {
+        stack.pop();
+        updateContainer();
     }
 
     public int size() {
@@ -50,9 +42,15 @@ public final class ViewStack {
     }
 
     private void updateContainer() {
+        Log.d("testing", "updateContainer: " + container);
         container.removeAllViews();
         if (stack.size() > 0) {
-            container.addView(stack.peek());
+            container.addView(stack.peek().createView(container.getContext()));
+            Log.d("testing", "view: " + container.getChildAt(0));
         }
+    }
+
+    public void saveToBundle(Bundle bundle) {
+        bundle.putSerializable(STACK_TAG, stack);
     }
 }
