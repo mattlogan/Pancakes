@@ -6,9 +6,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
-import me.mattlogan.library.ViewStackListener;
 
-public class MainActivity extends AppCompatActivity implements ViewStackListener {
 
     private ViewStack viewStack;
 
@@ -21,21 +19,13 @@ public class MainActivity extends AppCompatActivity implements ViewStackListener
     }
 
     @Override
+    }
+
+    @Override
     public void onBackPressed() {
         viewStack.pop();
     }
 
     @Override
-    public boolean onPopRequested(int size) {
-        if (size <= 1) {
-            finish();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onViewStackChanged(int size) {
-        Log.d("Pancakes", "View stack changed: " + size);
     }
 }
