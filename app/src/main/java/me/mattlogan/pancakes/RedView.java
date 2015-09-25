@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import me.mattlogan.library.ViewStack;
+import me.mattlogan.library.ViewStackActivity;
 
 public class RedView extends RelativeLayout {
 
-    private final ViewStack viewStack;
 
-    public RedView(final Context context, final ViewStack viewStack) {
+    public RedView(final Context context) {
         super(context);
-        this.viewStack = viewStack;
+        final ViewStack viewStack = ((ViewStackActivity) context).viewStack();
         LayoutInflater.from(context).inflate(R.layout.view_red, this, true);
 
         setBackgroundColor(Color.RED);
