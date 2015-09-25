@@ -2,11 +2,14 @@ package me.mattlogan.pancakes;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
+import me.mattlogan.library.ViewStackDelegate;
 
-public class MainActivity extends AppCompatActivity implements ViewStackActivity {
+public class MainActivity extends AppCompatActivity
+        implements ViewStackActivity, ViewStackDelegate {
 
     private ViewStack viewStack;
 
@@ -15,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements ViewStackActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container));
+        viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
 
         if (savedInstanceState != null) {
             viewStack.rebuildFromBundle(savedInstanceState);
@@ -38,5 +41,19 @@ public class MainActivity extends AppCompatActivity implements ViewStackActivity
     @Override
     public ViewStack viewStack() {
         return viewStack;
+    }
+
+    @Override
+    public boolean shouldUpdateViewStack(int oldSize, int newSize) {
+        if (oldSize == 1 && newSize == 0) {
+            finish();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onViewStackUpdated(int size) {
+        Log.d("MainActivity", "View stack updated: " + size);
     }
 }
