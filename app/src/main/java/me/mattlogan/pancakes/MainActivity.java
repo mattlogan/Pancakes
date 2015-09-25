@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
-import me.mattlogan.library.ViewStackActivity;
 
 public class MainActivity extends AppCompatActivity implements ViewStackActivity {
 

@@ -8,7 +8,6 @@ import android.widget.RelativeLayout;
 
 import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
-import me.mattlogan.library.ViewStackActivity;
 
 public class GreenView extends RelativeLayout {
 
