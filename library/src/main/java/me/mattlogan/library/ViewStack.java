@@ -26,11 +26,12 @@ public final class ViewStack {
         this.delegate = delegate;
     }
 
-    public void push(ViewFactory viewFactory) {
-        if (!delegate.shouldUpdateViewStack(size(), size() + 1)) return;
+    public ViewFactory push(ViewFactory viewFactory) {
+        if (!delegate.shouldUpdateViewStack(size(), size() + 1)) return null;
         stack.push(viewFactory);
         updateContainer();
         delegate.onViewStackUpdated(size());
+        return viewFactory;
     }
 
     @SuppressWarnings("all")
@@ -45,11 +46,16 @@ public final class ViewStack {
         delegate.onViewStackUpdated(size());
     }
 
-    public void pop() {
-        if (!delegate.shouldUpdateViewStack(size(), size() - 1)) return;
-        stack.pop();
+    public ViewFactory pop() {
+        if (!delegate.shouldUpdateViewStack(size(), size() - 1)) return null;
+        ViewFactory viewFactory = stack.pop();
         updateContainer();
         delegate.onViewStackUpdated(size());
+        return viewFactory;
+    }
+
+    public ViewFactory peek() {
+        return stack.peek();
     }
 
     public int size() {
