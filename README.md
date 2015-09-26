@@ -3,6 +3,12 @@ Pancakes
 
 Like FragmentManager but for Views
 
+Download
+----
+
+```
+compile 'me.mattlogan.pancakes:pancakes:1.0.0'
+```
 
 Usage
 -----
@@ -67,14 +73,10 @@ See the [sample app](https://github.com/mattlogan/Pancakes/tree/master/app) for 
 you should not keep references in a `ViewFactory` to any objects that should be garbage collected
 on a configuration change. Keep each `ViewFactory` as simple as possible.**
 
-Tests?
-----
-[Yes!](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
-
-Download
+Tests
 ----
 
-Coming soon
+[Yep](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
 
 License
 -----
