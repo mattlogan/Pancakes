@@ -62,6 +62,11 @@ public final class ViewStack {
         return stack.size();
     }
 
+    public void clear() {
+        stack.clear();
+        updateContainer();
+    }
+
     private void updateContainer() {
         container.removeAllViews();
         if (stack.size() > 0) {
