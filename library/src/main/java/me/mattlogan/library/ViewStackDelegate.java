@@ -1,17 +1,11 @@
 package me.mattlogan.library;
 
 public interface ViewStackDelegate {
-    boolean shouldUpdateViewStack(int oldSize, int newSize);
-    void onViewStackUpdated(int size);
+    void onFinishStack();
 
     ViewStackDelegate DEFAULT = new ViewStackDelegate() {
         @Override
-        public boolean shouldUpdateViewStack(int oldSize, int newSize) {
-            return newSize != 0;
-        }
-
-        @Override
-        public void onViewStackUpdated(int size) {
+        public void onFinishStack() {
             // Ignore
         }
     };

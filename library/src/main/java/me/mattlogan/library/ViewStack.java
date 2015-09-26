@@ -27,10 +27,8 @@ public final class ViewStack {
     }
 
     public ViewFactory push(ViewFactory viewFactory) {
-        if (!delegate.shouldUpdateViewStack(size(), size() + 1)) return null;
         stack.push(viewFactory);
         updateContainer();
-        delegate.onViewStackUpdated(size());
         return viewFactory;
     }
 
@@ -38,20 +36,19 @@ public final class ViewStack {
     public void rebuildFromBundle(Bundle bundle) {
         Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(STACK_TAG);
         for (ViewFactory viewFactory : savedStack) {
-            if (delegate.shouldUpdateViewStack(size(), size() + 1)) {
-                stack.push(viewFactory);
-            }
+            stack.push(viewFactory);
         }
         updateContainer();
-        delegate.onViewStackUpdated(size());
     }
 
     public ViewFactory pop() {
-        if (!delegate.shouldUpdateViewStack(size(), size() - 1)) return null;
-        ViewFactory viewFactory = stack.pop();
-        updateContainer();
-        delegate.onViewStackUpdated(size());
-        return viewFactory;
+        ViewFactory next = stack.pop();
+        if (size() == 0) {
+            delegate.onFinishStack();
+        } else {
+            updateContainer();
+        }
+        return next;
     }
 
     public ViewFactory peek() {

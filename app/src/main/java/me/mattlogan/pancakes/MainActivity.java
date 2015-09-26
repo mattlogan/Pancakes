@@ -44,16 +44,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean shouldUpdateViewStack(int oldSize, int newSize) {
-        if (oldSize == 1 && newSize == 0) {
-            finish();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onViewStackUpdated(int size) {
-        Log.d("MainActivity", "View stack updated: " + size);
+    public void onFinishStack() {
+        finish();
     }
 }
