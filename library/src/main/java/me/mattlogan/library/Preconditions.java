@@ -8,6 +8,12 @@ final class Preconditions {
         }
     }
 
+    static void checkStringNotEmpty(String s, String message) {
+        if (s == null || s.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     private Preconditions() {
         throw new AssertionError("No instances");
     }

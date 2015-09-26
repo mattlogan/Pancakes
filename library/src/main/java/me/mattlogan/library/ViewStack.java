@@ -6,10 +6,9 @@ import android.view.ViewGroup;
 import java.util.Stack;
 
 import static me.mattlogan.library.Preconditions.checkNotNull;
+import static me.mattlogan.library.Preconditions.checkStringNotEmpty;
 
 public final class ViewStack {
-
-    private static final String STACK_TAG = "stack";
 
     private final Stack<ViewFactory> stack = new Stack<>();
     private final ViewGroup container;
@@ -33,9 +32,11 @@ public final class ViewStack {
         return viewFactory;
     }
 
-    public void rebuildFromBundle(Bundle bundle) {
+    public void rebuildFromBundle(Bundle bundle, String tag) {
+        checkNotNull(bundle, "bundle == null");
+        checkStringNotEmpty(tag, "tag is empty");
         @SuppressWarnings("unchecked")
-        Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(STACK_TAG);
+        Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (ViewFactory viewFactory : savedStack) {
             stack.push(viewFactory);
@@ -68,8 +69,9 @@ public final class ViewStack {
         }
     }
 
-    public void saveToBundle(Bundle bundle) {
+    public void saveToBundle(Bundle bundle, String tag) {
         checkNotNull(bundle, "bundle == null");
-        bundle.putSerializable(STACK_TAG, stack);
+        checkStringNotEmpty(tag, "tag is empty");
+        bundle.putSerializable(tag, stack);
     }
 }
