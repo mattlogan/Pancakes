@@ -25,11 +25,10 @@ public final class ViewStack {
         this.delegate = delegate;
     }
 
-    public ViewFactory push(ViewFactory viewFactory) {
-        checkNotNull(viewFactory, "viewFactory == null");
-        stack.push(viewFactory);
-        updateContainer();
-        return viewFactory;
+    public void saveToBundle(Bundle bundle, String tag) {
+        checkNotNull(bundle, "bundle == null");
+        checkStringNotEmpty(tag, "tag is empty");
+        bundle.putSerializable(tag, stack);
     }
 
     public void rebuildFromBundle(Bundle bundle, String tag) {
@@ -42,6 +41,13 @@ public final class ViewStack {
             stack.push(viewFactory);
         }
         updateContainer();
+    }
+
+    public ViewFactory push(ViewFactory viewFactory) {
+        checkNotNull(viewFactory, "viewFactory == null");
+        stack.push(viewFactory);
+        updateContainer();
+        return viewFactory;
     }
 
     public ViewFactory pop() {
@@ -72,11 +78,5 @@ public final class ViewStack {
         if (stack.size() > 0) {
             container.addView(stack.peek().createView(container.getContext()));
         }
-    }
-
-    public void saveToBundle(Bundle bundle, String tag) {
-        checkNotNull(bundle, "bundle == null");
-        checkStringNotEmpty(tag, "tag is empty");
-        bundle.putSerializable(tag, stack);
     }
 }
