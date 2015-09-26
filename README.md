@@ -13,7 +13,7 @@ Create a `ViewStack` instance with a `ViewGroup` container and a `ViewStackDeleg
 ViewStack viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
 ```
 
-For each `View`, create a corresponding implementation of the `ViewFactory` interface:
+Create a `ViewFactory` for each `View`:
 
 ```java
 public final class RedViewFactory implements ViewFactory {
@@ -27,7 +27,7 @@ public final class RedViewFactory implements ViewFactory {
 Add a `View` to your container by pushing a `ViewFactory`:
 
 ```java
-viewStack.push(new RedView.Factory());
+viewStack.push(new RedViewFactory());
 ```
 
 Or call `pop()` to go back one `View`:
@@ -66,6 +66,10 @@ See the [sample app](https://github.com/mattlogan/Pancakes/tree/master/app) for 
 **Be careful: because `ViewFactory` instances are persisted across configuration changes,
 you should not keep references in a `ViewFactory` to any objects that should be garbage collected
 on a configuration change. Keep each `ViewFactory` as simple as possible.**
+
+Tests?
+----
+[Yes!](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me.mattlogan.library/ViewStackTest.java)
 
 Download
 ----
