@@ -45,12 +45,12 @@ public final class ViewStack {
     }
 
     public ViewFactory pop() {
-        ViewFactory next = stack.pop();
-        if (size() == 0) {
-            delegate.onFinishStack();
-        } else {
-            updateContainer();
+        if (size() == 1) {
+            delegate.finishStack();
+            return null;
         }
+        ViewFactory next = stack.pop();
+        updateContainer();
         return next;
     }
 

@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFinishStack() {
+    public void finishStack() {
         finish();
     }
 }
