@@ -13,10 +13,6 @@ public final class ViewStack {
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
 
-    public static ViewStack create(ViewGroup container) {
-        return new ViewStack(container, ViewStackDelegate.DEFAULT);
-    }
-
     public static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
         return new ViewStack(container, delegate);
     }
