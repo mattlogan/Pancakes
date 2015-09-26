@@ -69,7 +69,7 @@ on a configuration change. Keep each `ViewFactory` as simple as possible.**
 
 Tests?
 ----
-[Yes!](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me.mattlogan.library/ViewStackTest.java)
+[Yes!](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
 
 Download
 ----
