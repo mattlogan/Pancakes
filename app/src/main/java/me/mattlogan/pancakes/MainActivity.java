@@ -2,6 +2,7 @@ package me.mattlogan.pancakes;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void finishStack() {
+        Log.d("testing", "finishStack");
         finish();
     }
 }

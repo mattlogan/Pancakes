@@ -2,6 +2,7 @@ package me.mattlogan.pancakes;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -38,5 +39,19 @@ public class GreenView extends RelativeLayout {
                 viewStack.push(new BlueView.Factory());
             }
         });
+
+        Log.d("testing", "GreenView (" + hashCode() + ") created");
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.d("testing", "GreenView (" + hashCode() + ") onAttachedToWindow");
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.d("testing", "GreenView (" + hashCode() + ") onDetachedFromWindow");
     }
 }
