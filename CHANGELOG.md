@@ -1,12 +1,11 @@
-Change Log
-==========
+**Change Log**
 
-Version 1.0.0 *26-9-2015*
+Version 1.0.0 *9-26-2015*
 ----------------------------
 
-Initial release
+Initial release.
 
-Version 1.0.1 *30-9-2015*
+Version 1.0.1 *9-30-2015*
 ----------------------------
 
 Throw EmptyStackException in pop() and peek() if internal stack size is 0.
