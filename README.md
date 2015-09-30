@@ -7,7 +7,7 @@ Download
 ----
 
 ```
-compile 'me.mattlogan.pancakes:pancakes:1.0.0'
+compile 'me.mattlogan.pancakes:pancakes:1.0.1'
 ```
 
 Usage
