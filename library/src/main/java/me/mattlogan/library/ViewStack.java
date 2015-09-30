@@ -3,6 +3,7 @@ package me.mattlogan.library;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import static me.mattlogan.library.Preconditions.checkNotNull;
@@ -51,6 +52,9 @@ public final class ViewStack {
     }
 
     public ViewFactory pop() {
+        if (size() == 0) {
+            throw new EmptyStackException();
+        }
         if (size() == 1) {
             delegate.finishStack();
             return null;
@@ -61,6 +65,9 @@ public final class ViewStack {
     }
 
     public ViewFactory peek() {
+        if (size() == 0) {
+            throw new EmptyStackException();
+        }
         return stack.peek();
     }
 

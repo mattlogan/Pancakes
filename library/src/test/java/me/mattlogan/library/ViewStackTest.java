@@ -11,9 +11,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -192,6 +194,16 @@ public class ViewStackTest {
     }
 
     @Test
+    public void popWithSizeZero() {
+        try {
+            viewStack.pop();
+            fail();
+        } catch (EmptyStackException e) {
+            assertNotNull(e);
+        }
+    }
+
+    @Test
     public void popWithSizeOne() {
         viewStack.push(mock(ViewFactory.class));
 
@@ -222,6 +234,16 @@ public class ViewStackTest {
 
         verify(container).removeAllViews();
         verify(container).addView(view);
+    }
+
+    @Test
+    public void peekWithSizeZero() {
+        try {
+            viewStack.peek();
+            fail();
+        } catch (EmptyStackException e) {
+            assertNotNull(e);
+        }
     }
 
     @Test
