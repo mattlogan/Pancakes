@@ -5,3 +5,8 @@ Version 1.0.0 *26-9-2015*
 ----------------------------
 
 Initial release
+
+Version 1.0.1 *30-9-2015*
+----------------------------
+
+Throw EmptyStackException in pop() and peek() if internal stack size is 0.
