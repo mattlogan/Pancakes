@@ -1,6 +1,7 @@
 package me.mattlogan.library;
 
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.EmptyStackException;
@@ -69,6 +70,13 @@ public final class ViewStack {
             throw new EmptyStackException();
         }
         return stack.peek();
+    }
+
+    public View peekView() {
+        if (size() == 0) {
+            throw new EmptyStackException();
+        }
+        return container.getChildAt(0);
     }
 
     public int size() {
