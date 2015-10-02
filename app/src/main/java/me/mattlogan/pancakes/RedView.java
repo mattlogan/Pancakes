@@ -2,27 +2,43 @@ package me.mattlogan.pancakes;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
+import me.mattlogan.library.StatefulView;
 import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
 
-public class RedView extends RelativeLayout {
+public class RedView extends RelativeLayout implements StatefulView {
 
     public static class Factory implements ViewFactory {
         @Override
-        public View createView(Context context) {
-            return new RedView(context);
+        public View createView(Context context, ViewGroup container) {
+            return LayoutInflater.from(context).inflate(R.layout.view_red, container, false);
         }
     }
 
-    public RedView(final Context context) {
-        super(context);
-        final ViewStack viewStack = ((ViewStackActivity) context).viewStack();
-        LayoutInflater.from(context).inflate(R.layout.view_red, this, true);
+    private static final String SELECTED_RADIO_BUTTON_ID = "selected_radio_button_id";
+
+    private RadioGroup radioGroup;
+
+    public RedView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Log.d("testing", "RedView (" + hashCode() + ") created");
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        Log.d("testing", "RedView (" + hashCode() + ") onFinishInflate");
+
+        final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
         setBackgroundColor(Color.RED);
 
@@ -40,7 +56,7 @@ public class RedView extends RelativeLayout {
             }
         });
 
-        Log.d("testing", "RedView (" + hashCode() + ") created");
+        radioGroup = (RadioGroup) findViewById(R.id.red_radio_group);
     }
 
     @Override
@@ -53,5 +69,15 @@ public class RedView extends RelativeLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d("testing", "RedView (" + hashCode() + ") onDetachedFromWindow");
+    }
+
+    @Override
+    public void saveState(Bundle bundle) {
+        bundle.putInt(SELECTED_RADIO_BUTTON_ID, radioGroup.getCheckedRadioButtonId());
+    }
+
+    @Override
+    public void recreateState(Bundle bundle) {
+        radioGroup.check(bundle.getInt(SELECTED_RADIO_BUTTON_ID));
     }
 }

@@ -2,9 +2,11 @@ package me.mattlogan.pancakes;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import me.mattlogan.library.ViewFactory;
@@ -14,15 +16,22 @@ public class GreenView extends RelativeLayout {
 
     public static class Factory implements ViewFactory {
         @Override
-        public View createView(Context context) {
-            return new GreenView(context);
+        public View createView(Context context, ViewGroup container) {
+            return LayoutInflater.from(context).inflate(R.layout.view_green, container, false);
         }
     }
 
-    public GreenView(final Context context) {
-        super(context);
-        final ViewStack viewStack = ((ViewStackActivity) context).viewStack();
-        LayoutInflater.from(context).inflate(R.layout.view_green, this, true);
+    public GreenView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        Log.d("testing", "GreenView (" + hashCode() + ") created");
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        Log.d("testing", "GreenView (" + hashCode() + ") onFinishInflate");
+
+        final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
         setBackgroundColor(Color.GREEN);
 
@@ -39,8 +48,6 @@ public class GreenView extends RelativeLayout {
                 viewStack.push(new BlueView.Factory());
             }
         });
-
-        Log.d("testing", "GreenView (" + hashCode() + ") created");
     }
 
     @Override
