@@ -101,7 +101,7 @@ public final class ViewStack {
     private void updateContainer() {
         container.removeAllViews();
         if (stack.size() > 0) {
-            container.addView(stack.peek().createView(container.getContext()));
+            container.addView(stack.peek().createView(container.getContext(), container));
         }
     }
 }
