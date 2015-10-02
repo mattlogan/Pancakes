@@ -96,6 +96,8 @@ public class ViewStackTest {
 
     @Test
     public void saveToBundle() {
+        viewStack.push(mock(ViewFactory.class));
+
         Bundle bundle = mock(Bundle.class);
         viewStack.saveToBundle(bundle, "tag");
         verify(bundle).putSerializable(eq("tag"), isA(Stack.class));
@@ -155,7 +157,7 @@ public class ViewStackTest {
         Context context = mock(Context.class);
         View view = mock(View.class);
         when(container.getContext()).thenReturn(context);
-        when(top.createView(context)).thenReturn(view);
+        when(top.createView(context, container)).thenReturn(view);
         stack.push(top);
 
         Bundle bundle = mock(Bundle.class);
@@ -184,7 +186,7 @@ public class ViewStackTest {
         Context context = mock(Context.class);
         View view = mock(View.class);
         when(container.getContext()).thenReturn(context);
-        when(viewFactory.createView(context)).thenReturn(view);
+        when(viewFactory.createView(context, container)).thenReturn(view);
 
         viewStack.push(viewFactory);
 
@@ -226,7 +228,7 @@ public class ViewStackTest {
         reset(container);
 
         when(container.getContext()).thenReturn(context);
-        when(bottom.createView(context)).thenReturn(view);
+        when(bottom.createView(context, container)).thenReturn(view);
 
         ViewFactory result = viewStack.pop();
 
