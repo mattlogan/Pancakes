@@ -7,13 +7,13 @@ Download
 ----
 
 ```
-compile 'me.mattlogan.pancakes:pancakes:1.0.1'
+compile 'me.mattlogan.pancakes:pancakes:2.0.0'
 ```
 
 Usage
 -----
 
-Create a `ViewStack` instance with a `ViewGroup` container and a `ViewStackDelegate`: 
+Create a `ViewStack` instance with a `ViewGroup` container and a `ViewStackDelegate`:
 
 ```java
 ViewStack viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
@@ -22,10 +22,10 @@ ViewStack viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container),
 Create a `ViewFactory` for each `View`:
 
 ```java
-public final class RedViewFactory implements ViewFactory {
+public static class RedView.Factory implements ViewFactory {
     @Override
-    public View createView(Context context) {
-        return new RedView(context);
+    public View createView(Context context, ViewGroup container) {
+        return LayoutInflater.from(context).inflate(R.layout.view_red, container, false);
     }
 }
 ```
@@ -33,14 +33,16 @@ public final class RedViewFactory implements ViewFactory {
 Add a `View` to your container by pushing a `ViewFactory`:
 
 ```java
-viewStack.push(new RedViewFactory());
+viewStack.push(new RedView.Factory());
 ```
 
-Or call `pop()` to go back one `View`:
+Call `pop()` to go back one `View`:
 
 ```java
 viewStack.pop();
 ```
+
+Additionally, you can call `peek()` to get the `ViewFactory` that's on top of the stack or `peekView()` to get the `View` that's currently in the supplied container `ViewGroup`.
 
 Persist `ViewFactory` instances, in order, across configuration changes:
 
@@ -59,7 +61,21 @@ if (savedInstanceState != null) {
 }
 ```
 
-Implement `ViewStackDelegate` to take appropriate action when the stack is finished:
+You can also persist the state of a `View` by having your `View` implement `StatefulView`:
+
+```java
+@Override
+public void saveState(Bundle bundle) {
+    bundle.putInt(SELECTED_RADIO_BUTTON_ID, radioGroup.getCheckedRadioButtonId());
+}
+
+@Override
+public void recreateState(Bundle bundle) {
+    radioGroup.check(bundle.getInt(SELECTED_RADIO_BUTTON_ID));
+}
+```
+
+Finally, implement `ViewStackDelegate.finishStack()` to take appropriate action when the stack is finished:
 ```java
 @Override
 public void finishStack() {
