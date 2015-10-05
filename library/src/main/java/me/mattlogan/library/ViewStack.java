@@ -31,11 +31,6 @@ public final class ViewStack {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
         bundle.putSerializable(tag, stack);
-
-        View top = peekView();
-        if (top != null && top instanceof StatefulView) {
-            ((StatefulView) top).saveState(bundle);
-        }
     }
 
     public void rebuildFromBundle(Bundle bundle, String tag) {
@@ -48,11 +43,6 @@ public final class ViewStack {
             stack.push(viewFactory);
         }
         updateContainer();
-
-        View top = peekView();
-        if (top != null && top instanceof StatefulView) {
-            ((StatefulView) top).recreateState(bundle);
-        }
     }
 
     public ViewFactory push(ViewFactory viewFactory) {
