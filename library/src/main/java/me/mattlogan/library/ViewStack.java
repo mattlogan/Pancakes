@@ -12,7 +12,7 @@ import static me.mattlogan.library.Preconditions.checkStringNotEmpty;
 
 public final class ViewStack {
 
-    private final Stack<ViewFactory> stack = new Stack<>();
+    private final Stack<ViewData> stack = new Stack<>();
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
 
@@ -31,33 +31,26 @@ public final class ViewStack {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
         bundle.putSerializable(tag, stack);
-
-        View top = peekView();
-        if (top != null && top instanceof StatefulView) {
-            ((StatefulView) top).saveState(bundle);
-        }
     }
 
     public void rebuildFromBundle(Bundle bundle, String tag) {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
         @SuppressWarnings("unchecked")
-        Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
+        Stack<ViewData> savedStack = (Stack<ViewData>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
-        for (ViewFactory viewFactory : savedStack) {
-            stack.push(viewFactory);
+        for (ViewData viewData : savedStack) {
+            stack.push(viewData);
         }
         updateContainer();
-
-        View top = peekView();
-        if (top != null && top instanceof StatefulView) {
-            ((StatefulView) top).recreateState(bundle);
-        }
     }
 
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
-        stack.push(viewFactory);
+        if (stack.size() > 0 && peekView() instanceof StatefulView) {
+            ((StatefulView) peekView()).saveState(stack.peek().bundle());
+        }
+        stack.push(new ViewData(viewFactory));
         updateContainer();
         return viewFactory;
     }
@@ -70,16 +63,16 @@ public final class ViewStack {
             delegate.finishStack();
             return null;
         }
-        ViewFactory next = stack.pop();
+        ViewData popped = stack.pop();
         updateContainer();
-        return next;
+        return popped.viewFactory();
     }
 
     public ViewFactory peek() {
         if (size() == 0) {
             throw new EmptyStackException();
         }
-        return stack.peek();
+        return stack.peek().viewFactory();
     }
 
     public View peekView() {
@@ -101,7 +94,12 @@ public final class ViewStack {
     private void updateContainer() {
         container.removeAllViews();
         if (stack.size() > 0) {
-            container.addView(stack.peek().createView(container.getContext(), container));
+            ViewData nextData = stack.peek();
+            View view = nextData.viewFactory().createView(container.getContext(), container);
+            if (view instanceof StatefulView) {
+                ((StatefulView) view).recreateState(nextData.bundle());
+            }
+            container.addView(view);
         }
     }
 }
