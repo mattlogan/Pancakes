@@ -11,32 +11,4 @@
         android:layout_height="wrap_content"
         android:text="Back"/>
 
-    <RadioGroup
-        android:id="@+id/blue_radio_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/blue_button_back"
-        android:layout_marginTop="12dp">
-
-        <RadioButton
-            android:id="@+id/blue_ratio_button_1"
-            android:layout_marginRight="15dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <RadioButton
-            android:id="@+id/blue_ratio_button_2"
-            android:layout_marginRight="15dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <RadioButton
-            android:id="@+id/blue_ratio_button_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </RadioGroup>
-
 </me.mattlogan.pancakes.BlueView>
