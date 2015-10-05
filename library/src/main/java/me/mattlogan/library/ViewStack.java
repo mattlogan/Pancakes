@@ -96,7 +96,7 @@ public final class ViewStack {
         if (stack.size() > 0) {
             ViewData nextData = stack.peek();
             View view = nextData.viewFactory().createView(container.getContext(), container);
-            if (view instanceof StatefulView) {
+            if (view instanceof StatefulView && !nextData.bundle().isEmpty()) {
                 ((StatefulView) view).recreateState(nextData.bundle());
             }
             container.addView(view);
