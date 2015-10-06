@@ -1,12 +1,8 @@
 package me.mattlogan.pancakes;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
