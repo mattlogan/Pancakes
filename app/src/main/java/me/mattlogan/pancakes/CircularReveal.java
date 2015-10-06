@@ -21,9 +21,6 @@ public class CircularReveal implements PushAnimation {
         // create the animator for this view (the start radius is zero)
         Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
 
-        // make the view visible and start the animation
-        view.setVisibility(View.VISIBLE);
-
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
