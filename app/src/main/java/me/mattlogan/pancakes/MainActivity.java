@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
 import me.mattlogan.library.ViewStackDelegate;
+import me.mattlogan.pancakes.view.RedView;
 
 public class MainActivity extends AppCompatActivity
         implements ViewStackActivity, ViewStackDelegate {

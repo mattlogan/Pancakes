@@ -1,4 +1,4 @@
-package me.mattlogan.pancakes;
+package me.mattlogan.pancakes.view;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -11,6 +11,10 @@ import android.widget.RelativeLayout;
 
 import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
+import me.mattlogan.pancakes.animation.CircularHide;
+import me.mattlogan.pancakes.animation.CircularReveal;
+import me.mattlogan.pancakes.R;
+import me.mattlogan.pancakes.ViewStackActivity;
 
 public class GreenView extends RelativeLayout {
 

@@ -1,4 +1,4 @@
-package me.mattlogan.pancakes;
+package me.mattlogan.pancakes.animation;
 
 import android.animation.Animator;
 import android.view.View;

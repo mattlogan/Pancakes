@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<me.mattlogan.pancakes.BlueView
+<me.mattlogan.pancakes.view.BlueView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/blue_view"
     android:background="#0000FF"
@@ -41,4 +41,4 @@
 
     </RadioGroup>
 
-</me.mattlogan.pancakes.BlueView>
+</me.mattlogan.pancakes.view.BlueView>

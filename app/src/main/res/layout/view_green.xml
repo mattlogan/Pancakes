@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<me.mattlogan.pancakes.GreenView
+<me.mattlogan.pancakes.view.GreenView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/green_view"
     android:background="#00FF00"
@@ -55,4 +55,4 @@
 
     </RadioGroup>
 
-</me.mattlogan.pancakes.GreenView>
+</me.mattlogan.pancakes.view.GreenView>
