@@ -4,6 +4,9 @@ import android.animation.Animator;
 import android.animation.TimeInterpolator;
 import android.view.View;
 
+/**
+ * Interface for creating Animator instances for push() and pop() transitions.
+ */
 public interface AnimatorFactory {
     Animator createAnimator(View view);
 
