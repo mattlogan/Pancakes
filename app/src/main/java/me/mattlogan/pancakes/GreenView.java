@@ -1,6 +1,7 @@
 package me.mattlogan.pancakes;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class GreenView extends RelativeLayout {
         findViewById(R.id.green_button_back).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("testing", "GreenView popping itself");
                 viewStack.pop();
             }
         });
@@ -42,6 +44,7 @@ public class GreenView extends RelativeLayout {
         findViewById(R.id.green_button_go_to_blue).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("testing", "GreenView pushing BlueView");
                 viewStack.push(new BlueView.Factory());
             }
         });
@@ -53,9 +56,24 @@ public class GreenView extends RelativeLayout {
         Log.d("testing", "GreenView (" + hashCode() + ") onAttachedToWindow");
     }
 
+    // Note: This won't be called when we push the next View onto the stack because this View is
+    // kept in the container's view hierarchy. It's visibility is just set to gone.
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d("testing", "GreenView (" + hashCode() + ") onDetachedFromWindow");
+    }
+
+    // Note: These instance state saving methods will only be called if the view has an id.
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Log.d("testing", "GreenView (" + hashCode() + ") onSaveInstanceState");
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("testing", "GreenView (" + hashCode() + ") onRestoreInstanceState");
     }
 }

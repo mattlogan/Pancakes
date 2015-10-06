@@ -1,6 +1,7 @@
 package me.mattlogan.pancakes;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class BlueView extends RelativeLayout {
         findViewById(R.id.blue_button_back).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("testing", "BlueView popping itself");
                 viewStack.pop();
             }
         });
@@ -50,5 +52,18 @@ public class BlueView extends RelativeLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d("testing", "BlueView (" + hashCode() + ") onDetachedFromWindow");
+    }
+
+    // Note: These instance state saving methods will only be called if the view has an id.
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Log.d("testing", "BlueView (" + hashCode() + ") onSaveInstanceState");
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("testing", "BlueView (" + hashCode() + ") onRestoreInstanceState");
     }
 }
