@@ -2,7 +2,7 @@
 <me.mattlogan.pancakes.GreenView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/green_view"
-    android:background="#8000FF00"
+    android:background="#00FF00"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

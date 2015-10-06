@@ -37,7 +37,7 @@ public class GreenView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "GreenView popping itself");
-                viewStack.pop();
+                viewStack.popWithAnimation(new CircularHide());
             }
         });
 
@@ -45,7 +45,7 @@ public class GreenView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "GreenView pushing BlueView");
-                viewStack.push(new BlueView.Factory());
+                viewStack.pushWithAnimation(new BlueView.Factory(), new CircularReveal());
             }
         });
     }
@@ -75,5 +75,11 @@ public class GreenView extends RelativeLayout {
     protected void onRestoreInstanceState(Parcelable savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d("testing", "GreenView (" + hashCode() + ") onRestoreInstanceState");
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.d("testing", "onMeasure");
     }
 }

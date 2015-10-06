@@ -45,7 +45,7 @@ public class RedView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "RedView pushing GreenView");
-                viewStack.push(new GreenView.Factory());
+                viewStack.pushWithAnimation(new GreenView.Factory(), new CircularReveal());
             }
         });
     }

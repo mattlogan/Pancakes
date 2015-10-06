@@ -37,7 +37,7 @@ public class BlueView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "BlueView popping itself");
-                viewStack.pop();
+                viewStack.popWithAnimation(new CircularHide());
             }
         });
     }
