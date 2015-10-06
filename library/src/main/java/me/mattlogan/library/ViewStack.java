@@ -46,15 +46,30 @@ public final class ViewStack {
 
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
+        return pushWithAnimation(viewFactory, PushAnimation.NONE);
+    }
+
+    public ViewFactory pushWithAnimation(ViewFactory viewFactory, final PushAnimation animation) {
+        checkNotNull(viewFactory, "viewFactory == null");
+        checkNotNull(animation, "animation == null");
         stack.push(viewFactory);
-        container.addView(viewFactory.createView(container.getContext(), container));
-        if (container.getChildCount() > 1) {
-            container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
-        }
+        View view = viewFactory.createView(container.getContext(), container);
+        container.addView(view);
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
+            @Override
+            public void onFirstLayout(View view) {
+                animation.animate(view, pushAnimationCallback);
+            }
+        });
         return viewFactory;
     }
 
     public ViewFactory pop() {
+        return popWithAnimation(PopAnimation.NONE);
+    }
+
+    public ViewFactory popWithAnimation(PopAnimation animation) {
+        checkNotNull(animation, "animation == null");
         if (size() == 0) {
             throw new EmptyStackException();
         }
@@ -63,8 +78,8 @@ public final class ViewStack {
             return null;
         }
         ViewFactory popped = stack.pop();
-        container.removeViewAt(container.getChildCount() - 1);
-        peekView().setVisibility(View.VISIBLE);
+        container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
+        animation.animate(peekView(), popAnimationCallback);
         return popped;
     }
 
@@ -90,4 +105,20 @@ public final class ViewStack {
         stack.clear();
         container.removeAllViews();
     }
+
+    private PushAnimation.Callback pushAnimationCallback = new PushAnimation.Callback() {
+        @Override
+        public void animationDone() {
+            if (container.getChildCount() > 1) {
+                container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
+            }
+        }
+    };
+
+    private PopAnimation.Callback popAnimationCallback = new PopAnimation.Callback() {
+        @Override
+        public void animationDone() {
+            container.removeView(peekView());
+        }
+    };
 }
