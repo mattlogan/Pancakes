@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         viewStack.saveToBundle(outState, STACK_TAG);
         super.onSaveInstanceState(outState);
+        Log.d("testing", "bundle:" + outState);
     }
 
     @Override

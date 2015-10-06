@@ -2,8 +2,11 @@ package me.mattlogan.pancakes;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +35,6 @@ public class RedView extends RelativeLayout {
         Log.d("testing", "RedView (" + hashCode() + ") onFinishInflate");
 
         final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
-
-        setBackgroundColor(Color.RED);
 
         findViewById(R.id.red_button_back).setOnClickListener(new OnClickListener() {
             @Override

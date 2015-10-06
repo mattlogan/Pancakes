@@ -33,8 +33,6 @@ public class BlueView extends RelativeLayout {
 
         final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
-        setBackgroundColor(Color.BLUE);
-
         findViewById(R.id.blue_button_back).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

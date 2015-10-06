@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <me.mattlogan.pancakes.RedView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/red_view"
+    android:background="#80FF0000"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

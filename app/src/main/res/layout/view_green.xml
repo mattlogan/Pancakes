@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <me.mattlogan.pancakes.GreenView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/green_view"
+    android:background="#8000FF00"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/green_buttons"
         android:orientation="horizontal"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
@@ -23,5 +26,33 @@
             android:text="Go to blue"/>
 
     </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/green_radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/green_buttons"
+        android:layout_marginTop="12dp">
+
+        <RadioButton
+            android:id="@+id/green_ratio_button_1"
+            android:layout_marginRight="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/green_ratio_button_2"
+            android:layout_marginRight="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/green_ratio_button_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RadioGroup>
 
 </me.mattlogan.pancakes.GreenView>
