@@ -1,16 +1,15 @@
 package me.mattlogan.pancakes;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 
-import me.mattlogan.library.PopAnimation;
+import me.mattlogan.library.AnimatorFactory;
 
-public class CircularHide implements PopAnimation {
+public class CircularHide implements AnimatorFactory {
 
     @Override
-    public void animate(final View view, final Callback callback) {
+    public Animator createAnimator(View view) {
         // get the center for the clipping circle
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
@@ -19,17 +18,6 @@ public class CircularHide implements PopAnimation {
         int initialRadius = view.getWidth();
 
         // create the animation (the final radius is zero)
-        Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
-
-        // make the view invisible when the animation is done
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                callback.animationDone();
-            }
-        });
-
-        // start the animation
-        anim.start();
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
     }
 }

@@ -1,16 +1,15 @@
 package me.mattlogan.pancakes;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 
-import me.mattlogan.library.PushAnimation;
+import me.mattlogan.library.AnimatorFactory;
 
-public class CircularReveal implements PushAnimation {
+public class CircularReveal implements AnimatorFactory {
 
     @Override
-    public void animate(View view, final PushAnimation.Callback callback) {
+    public Animator createAnimator(View view) {
         // get the center for the clipping circle
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
@@ -19,15 +18,6 @@ public class CircularReveal implements PushAnimation {
         int finalRadius = Math.max(view.getWidth(), view.getHeight());
 
         // create the animator for this view (the start radius is zero)
-        Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                callback.animationDone();
-            }
-        });
-
-        anim.start();
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
     }
 }

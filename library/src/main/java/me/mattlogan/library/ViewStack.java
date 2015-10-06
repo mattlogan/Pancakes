@@ -1,5 +1,8 @@
 package me.mattlogan.library;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.TimeInterpolator;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,30 +49,32 @@ public final class ViewStack {
 
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
-        return pushWithAnimation(viewFactory, PushAnimation.NONE);
+        return pushWithAnimation(viewFactory, AnimatorFactory.NONE);
     }
 
-    public ViewFactory pushWithAnimation(ViewFactory viewFactory, final PushAnimation animation) {
+    public ViewFactory pushWithAnimation(ViewFactory viewFactory, final AnimatorFactory animatorFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
-        checkNotNull(animation, "animation == null");
+        checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(viewFactory);
         View view = viewFactory.createView(container.getContext(), container);
         container.addView(view);
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
             @Override
             public void onFirstLayout(View view) {
-                animation.animate(view, pushAnimationCallback);
+                Animator animator = animatorFactory.createAnimator(view);
+                animator.addListener(pushAnimatorListener);
+                animator.start();
             }
         });
         return viewFactory;
     }
 
     public ViewFactory pop() {
-        return popWithAnimation(PopAnimation.NONE);
+        return popWithAnimation(AnimatorFactory.NONE);
     }
 
-    public ViewFactory popWithAnimation(PopAnimation animation) {
-        checkNotNull(animation, "animation == null");
+    public ViewFactory popWithAnimation(AnimatorFactory animatorFactory) {
+        checkNotNull(animatorFactory, "animatorFactory == null");
         if (size() == 0) {
             throw new EmptyStackException();
         }
@@ -79,7 +84,9 @@ public final class ViewStack {
         }
         ViewFactory popped = stack.pop();
         container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
-        animation.animate(peekView(), popAnimationCallback);
+        Animator animator = animatorFactory.createAnimator(peekView());
+        animator.addListener(popAnimationListener);
+        animator.start();
         return popped;
     }
 
@@ -106,18 +113,18 @@ public final class ViewStack {
         container.removeAllViews();
     }
 
-    private PushAnimation.Callback pushAnimationCallback = new PushAnimation.Callback() {
+    private Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
         @Override
-        public void animationDone() {
+        public void onAnimationEnd(Animator animator) {
             if (container.getChildCount() > 1) {
                 container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
             }
         }
     };
 
-    private PopAnimation.Callback popAnimationCallback = new PopAnimation.Callback() {
+    private Animator.AnimatorListener popAnimationListener = new AnimatorListenerAdapter() {
         @Override
-        public void animationDone() {
+        public void onAnimationEnd(Animator animator) {
             container.removeView(peekView());
         }
     };
