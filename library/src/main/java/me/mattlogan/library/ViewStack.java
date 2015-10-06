@@ -40,15 +40,17 @@ public final class ViewStack {
         Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (ViewFactory viewFactory : savedStack) {
-            stack.push(viewFactory);
+            push(viewFactory);
         }
-        updateContainer();
     }
 
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
         stack.push(viewFactory);
-        updateContainer();
+        container.addView(viewFactory.createView(container.getContext(), container));
+        if (container.getChildCount() > 1) {
+            container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
+        }
         return viewFactory;
     }
 
@@ -61,7 +63,8 @@ public final class ViewStack {
             return null;
         }
         ViewFactory next = stack.pop();
-        updateContainer();
+        container.removeViewAt(container.getChildCount() - 1);
+        peekView().setVisibility(View.VISIBLE);
         return next;
     }
 
@@ -76,7 +79,7 @@ public final class ViewStack {
         if (size() == 0) {
             throw new EmptyStackException();
         }
-        return container.getChildAt(0);
+        return container.getChildAt(container.getChildCount() - 1);
     }
 
     public int size() {
@@ -85,13 +88,6 @@ public final class ViewStack {
 
     public void clear() {
         stack.clear();
-        updateContainer();
-    }
-
-    private void updateContainer() {
         container.removeAllViews();
-        if (stack.size() > 0) {
-            container.addView(stack.peek().createView(container.getContext(), container));
-        }
     }
 }
