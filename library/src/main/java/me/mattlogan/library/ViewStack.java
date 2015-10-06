@@ -62,10 +62,10 @@ public final class ViewStack {
             delegate.finishStack();
             return null;
         }
-        ViewFactory next = stack.pop();
+        ViewFactory popped = stack.pop();
         container.removeViewAt(container.getChildCount() - 1);
         peekView().setVisibility(View.VISIBLE);
-        return next;
+        return popped;
     }
 
     public ViewFactory peek() {
