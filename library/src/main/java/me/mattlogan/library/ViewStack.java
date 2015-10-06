@@ -33,10 +33,10 @@ public final class ViewStack {
         bundle.putSerializable(tag, stack);
     }
 
+    @SuppressWarnings("unchecked")
     public void rebuildFromBundle(Bundle bundle, String tag) {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
-        @SuppressWarnings("unchecked")
         Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (ViewFactory viewFactory : savedStack) {
