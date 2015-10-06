@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <me.mattlogan.pancakes.BlueView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/blue_view"
     android:background="#800000FF"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
