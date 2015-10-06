@@ -2,7 +2,6 @@ package me.mattlogan.library;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.TimeInterpolator;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
