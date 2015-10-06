@@ -9,7 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -150,15 +153,32 @@ public class ViewStackTest {
     public void rebuildFromBundle() {
         Stack<ViewFactory> stack = new Stack<>();
 
+        Context context = mock(Context.class);
+        when(container.getContext()).thenReturn(context);
+
         ViewFactory bottom = mock(ViewFactory.class);
+        View bottomView = mock(View.class);
+        when(bottom.createView(context, container)).thenReturn(bottomView);
         stack.push(bottom);
 
         ViewFactory top = mock(ViewFactory.class);
-        Context context = mock(Context.class);
-        View view = mock(View.class);
-        when(container.getContext()).thenReturn(context);
-        when(top.createView(context, container)).thenReturn(view);
+        View topView = mock(View.class);
+        when(top.createView(context, container)).thenReturn(topView);
         stack.push(top);
+
+        // First time return 1, second time return 2
+        when(container.getChildCount()).thenAnswer(new Answer() {
+            int count = 0;
+            public Object answer(InvocationOnMock invocation) {
+                if (count == 0) {
+                    count++;
+                    return 1;
+                }
+                return 2;
+            }
+        });
+
+        when(container.getChildAt(0)).thenReturn(bottomView);
 
         Bundle bundle = mock(Bundle.class);
         when(bundle.getSerializable("tag")).thenReturn(stack);
@@ -166,8 +186,9 @@ public class ViewStackTest {
         viewStack.rebuildFromBundle(bundle, "tag");
 
         assertEquals(2, viewStack.size());
-        verify(container).removeAllViews();
-        verify(container).addView(view);
+        verify(container).addView(bottomView);
+        verify(container).addView(topView);
+        verify(bottomView).setVisibility(View.GONE);
     }
 
     @Test
