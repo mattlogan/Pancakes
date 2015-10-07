@@ -6,7 +6,7 @@ Like FragmentManager but for Views
 Download
 ----
 
-```
+```java
 compile 'me.mattlogan.pancakes:pancakes:3.0.0'
 ```
 
@@ -53,8 +53,7 @@ public class CircularReveal implements AnimatorFactory {
 
         int finalRadius = Math.max(view.getWidth(), view.getHeight());
 
-        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius)
-                .setDuration(400);
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
     }
 }
 ```
@@ -97,7 +96,7 @@ on a configuration change. Keep each `ViewFactory` as simple as possible.**
 Tests
 ----
 
-Unit tests located in [/library/src/test/]((https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
+Unit tests located in [/library/src/test/](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
 
 License
 -----
