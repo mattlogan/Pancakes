@@ -82,7 +82,7 @@ public final class ViewStack {
         stack.push(viewFactory);
         View view = viewFactory.createView(container.getContext(), container);
         container.addView(view);
-        setBelowViewVisibilityGone();
+        setBelowViewVisibility(View.GONE);
         return viewFactory;
     }
 
@@ -105,6 +105,8 @@ public final class ViewStack {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
             @Override
             public void onFirstLayout(View view) {
+                // We have to wait until the View's first layout pass to start the animation,
+                // otherwise the view's width and height would be zero.
                 startAnimation(animatorFactory, view, pushAnimatorListener);
             }
         });
@@ -118,15 +120,9 @@ public final class ViewStack {
      * navigation stack
      */
     public ViewFactory pop() {
-        if (size() == 0) {
-            throw new EmptyStackException();
-        }
-        if (size() == 1) {
-            delegate.finishStack();
-            return null;
-        }
+        if (!shouldPop()) return null;
         ViewFactory popped = stack.pop();
-        container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
+        setBelowViewVisibility(View.VISIBLE);
         container.removeView(peekView());
         return popped;
     }
@@ -142,15 +138,9 @@ public final class ViewStack {
      */
     public ViewFactory popWithAnimation(AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
-        if (size() == 0) {
-            throw new EmptyStackException();
-        }
-        if (size() == 1) {
-            delegate.finishStack();
-            return null;
-        }
+        if (!shouldPop()) return null;
         ViewFactory popped = stack.pop();
-        container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
+        setBelowViewVisibility(View.VISIBLE);
         startAnimation(animatorFactory, peekView(), popAnimationListener);
         return popped;
     }
@@ -193,7 +183,7 @@ public final class ViewStack {
     private Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animator) {
-            setBelowViewVisibilityGone();
+            setBelowViewVisibility(View.GONE);
         }
     };
 
@@ -204,9 +194,9 @@ public final class ViewStack {
         }
     };
 
-    private void setBelowViewVisibilityGone() {
+    private void setBelowViewVisibility(int visibility) {
         if (container.getChildCount() > 1) {
-            container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
+            container.getChildAt(container.getChildCount() - 2).setVisibility(visibility);
         }
     }
 
@@ -215,5 +205,16 @@ public final class ViewStack {
         Animator animator = animatorFactory.createAnimator(view);
         animator.addListener(listener);
         animator.start();
+    }
+
+    private boolean shouldPop() {
+        if (size() == 0) {
+            throw new EmptyStackException();
+        }
+        if (size() == 1) {
+            delegate.finishStack();
+            return false;
+        }
+        return true;
     }
 }
