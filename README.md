@@ -7,7 +7,7 @@ Download
 ----
 
 ```
-compile 'me.mattlogan.pancakes:pancakes:2.0.0'
+compile 'me.mattlogan.pancakes:pancakes:3.0.0'
 ```
 
 Usage
@@ -16,13 +16,13 @@ Usage
 Create a `ViewStack` instance with a `ViewGroup` container and a `ViewStackDelegate`:
 
 ```java
-ViewStack viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
+ViewStack viewStack = ViewStack.create(container, this);
 ```
 
 Create a `ViewFactory` for each `View`:
 
 ```java
-public static class RedView.Factory implements ViewFactory {
+public class RedViewFactory implements ViewFactory {
     @Override
     public View createView(Context context, ViewGroup container) {
         return LayoutInflater.from(context).inflate(R.layout.view_red, container, false);
@@ -33,7 +33,7 @@ public static class RedView.Factory implements ViewFactory {
 Add a `View` to your container by pushing a `ViewFactory`:
 
 ```java
-viewStack.push(new RedView.Factory());
+viewStack.push(new RedViewFactory());
 ```
 
 Call `pop()` to go back one `View`:
@@ -42,7 +42,24 @@ Call `pop()` to go back one `View`:
 viewStack.pop();
 ```
 
-Additionally, you can call `peek()` to get the `ViewFactory` that's on top of the stack or `peekView()` to get the `View` that's currently in the supplied container `ViewGroup`.
+Or, use an `AnimatorFactory` along with `pushWithAnimation(ViewFactory, AnimatorFactory)` and `popWithAnimation(AnimatorFactory)` to add remove a `View` with a transition animation.
+
+```java
+public class CircularReveal implements AnimatorFactory {
+    @Override
+    public Animator createAnimator(View view) {
+        int cx = view.getWidth() / 2;
+        int cy = view.getHeight() / 2;
+
+        int finalRadius = Math.max(view.getWidth(), view.getHeight());
+
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius)
+                .setDuration(400);
+    }
+}
+```
+
+You can also call `peek()` and `peekView()` to get the `ViewFactory` and `View` at the top of the navigation stack.
 
 Persist `ViewFactory` instances, in order, across configuration changes:
 
@@ -61,19 +78,7 @@ if (savedInstanceState != null) {
 }
 ```
 
-You can also persist the state of a `View` by having your `View` implement `StatefulView`:
-
-```java
-@Override
-public void saveState(Bundle bundle) {
-    bundle.putInt(SELECTED_RADIO_BUTTON_ID, radioGroup.getCheckedRadioButtonId());
-}
-
-@Override
-public void recreateState(Bundle bundle) {
-    radioGroup.check(bundle.getInt(SELECTED_RADIO_BUTTON_ID));
-}
-```
+Additionally, you may use `View.onSaveInstanceState(Bundle)` and `View.onRestoreInstanceState(Bundle)` to save the state of any `View` in the navigation stack so long as it has an ID.
 
 Finally, implement `ViewStackDelegate.finishStack()` to take appropriate action when the stack is finished:
 ```java
@@ -92,7 +97,7 @@ on a configuration change. Keep each `ViewFactory` as simple as possible.**
 Tests
 ----
 
-[Yep](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
+Unit tests located in [/library/src/test/]((https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
 
 License
 -----
