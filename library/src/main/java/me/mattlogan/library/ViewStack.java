@@ -105,9 +105,7 @@ public final class ViewStack {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
             @Override
             public void onFirstLayout(View view) {
-                Animator animator = animatorFactory.createAnimator(view);
-                animator.addListener(pushAnimatorListener);
-                animator.start();
+                startAnimation(animatorFactory, view, pushAnimatorListener);
             }
         });
         return viewFactory;
@@ -153,9 +151,7 @@ public final class ViewStack {
         }
         ViewFactory popped = stack.pop();
         container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
-        Animator animator = animatorFactory.createAnimator(peekView());
-        animator.addListener(popAnimationListener);
-        animator.start();
+        startAnimation(animatorFactory, peekView(), popAnimationListener);
         return popped;
     }
 
@@ -212,5 +208,12 @@ public final class ViewStack {
         if (container.getChildCount() > 1) {
             container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
         }
+    }
+
+    private void startAnimation(AnimatorFactory animatorFactory, View view,
+                                Animator.AnimatorListener listener) {
+        Animator animator = animatorFactory.createAnimator(view);
+        animator.addListener(listener);
+        animator.start();
     }
 }
