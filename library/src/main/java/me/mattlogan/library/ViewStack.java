@@ -79,7 +79,11 @@ public final class ViewStack {
      */
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
-        return pushWithAnimation(viewFactory, AnimatorFactory.NONE);
+        stack.push(viewFactory);
+        View view = viewFactory.createView(container.getContext(), container);
+        container.addView(view);
+        setBelowViewVisibilityGone();
+        return viewFactory;
     }
 
     /**
@@ -116,7 +120,17 @@ public final class ViewStack {
      * navigation stack
      */
     public ViewFactory pop() {
-        return popWithAnimation(AnimatorFactory.NONE);
+        if (size() == 0) {
+            throw new EmptyStackException();
+        }
+        if (size() == 1) {
+            delegate.finishStack();
+            return null;
+        }
+        ViewFactory popped = stack.pop();
+        container.getChildAt(container.getChildCount() - 2).setVisibility(View.VISIBLE);
+        container.removeView(peekView());
+        return popped;
     }
 
     /**
@@ -183,9 +197,7 @@ public final class ViewStack {
     private Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animator) {
-            if (container.getChildCount() > 1) {
-                container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
-            }
+            setBelowViewVisibilityGone();
         }
     };
 
@@ -195,4 +207,10 @@ public final class ViewStack {
             container.removeView(peekView());
         }
     };
+
+    private void setBelowViewVisibilityGone() {
+        if (container.getChildCount() > 1) {
+            container.getChildAt(container.getChildCount() - 2).setVisibility(View.GONE);
+        }
+    }
 }
