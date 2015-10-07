@@ -1,15 +1,17 @@
 package me.mattlogan.library;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -26,6 +28,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -99,7 +102,7 @@ public class ViewStackTest {
 
     @Test
     public void saveToBundle() {
-        viewStack.push(mock(ViewFactory.class));
+        viewStack.push(newMockViewFactory());
 
         Bundle bundle = mock(Bundle.class);
         viewStack.saveToBundle(bundle, "tag");
@@ -159,16 +162,19 @@ public class ViewStackTest {
         ViewFactory bottom = mock(ViewFactory.class);
         View bottomView = mock(View.class);
         when(bottom.createView(context, container)).thenReturn(bottomView);
+        when(bottomView.getViewTreeObserver()).thenReturn(mock(ViewTreeObserver.class));
         stack.push(bottom);
 
         ViewFactory top = mock(ViewFactory.class);
         View topView = mock(View.class);
         when(top.createView(context, container)).thenReturn(topView);
+        when(topView.getViewTreeObserver()).thenReturn(mock(ViewTreeObserver.class));
         stack.push(top);
 
         // First time return 1, second time return 2
         when(container.getChildCount()).thenAnswer(new Answer() {
             int count = 0;
+
             public Object answer(InvocationOnMock invocation) {
                 if (count == 0) {
                     count++;
@@ -202,18 +208,176 @@ public class ViewStackTest {
     }
 
     @Test
-    public void push() {
-        ViewFactory viewFactory = mock(ViewFactory.class);
+    public void pushFirstTime() {
+        // Applies to both bottom and top
         Context context = mock(Context.class);
-        View view = mock(View.class);
         when(container.getContext()).thenReturn(context);
+
+        // Bottom
+        View view = mock(View.class);
+        ViewFactory viewFactory = mock(ViewFactory.class);
+
         when(viewFactory.createView(context, container)).thenReturn(view);
+
+        when(container.getChildCount()).thenReturn(1);
 
         viewStack.push(viewFactory);
 
         assertEquals(1, viewStack.size());
-        verify(container).removeAllViews();
         verify(container).addView(view);
+    }
+
+    @Test
+    public void pushSecondTime() {
+        // Applies to both bottom and top
+        Context context = mock(Context.class);
+        when(container.getContext()).thenReturn(context);
+
+        // Bottom
+        View bottomView = mock(View.class);
+        ViewFactory bottomViewFactory = mock(ViewFactory.class);
+
+        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+
+        viewStack.push(bottomViewFactory);
+
+        // Top
+        View topView = mock(View.class);
+        ViewFactory topViewFactory = mock(ViewFactory.class);
+
+        when(topViewFactory.createView(context, container)).thenReturn(topView);
+
+        when(container.getChildCount()).thenReturn(2);
+        when(container.getChildAt(0)).thenReturn(bottomView);
+
+        viewStack.push(topViewFactory);
+
+        assertEquals(2, viewStack.size());
+        verify(container).addView(bottomView);
+        verify(container).addView(topView);
+        verify(bottomView).setVisibility(View.GONE);
+    }
+
+    @Test
+    public void pushWithAnimationWithNullViewFactory() {
+        try {
+            viewStack.pushWithAnimation(null, mock(AnimatorFactory.class));
+            fail();
+        } catch (NullPointerException e) {
+            assertEquals("viewFactory == null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void pushWithAnimationWithNullAnimatorFactory() {
+        try {
+            viewStack.pushWithAnimation(mock(ViewFactory.class), null);
+            fail();
+        } catch (NullPointerException e) {
+            assertEquals("animatorFactory == null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void pushWithAnimationFirstTime() {
+        // Applies to both bottom and top
+        Context context = mock(Context.class);
+        when(container.getContext()).thenReturn(context);
+
+        // Top
+        View view = mock(View.class);
+        ViewFactory viewFactory = mock(ViewFactory.class);
+        ViewTreeObserver observer = mock(ViewTreeObserver.class);
+
+        when(viewFactory.createView(context, container)).thenReturn(view);
+        when(view.getViewTreeObserver()).thenReturn(observer);
+
+        AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
+        Animator animator = mock(Animator.class);
+        when(animatorFactory.createAnimator(view)).thenReturn(animator);
+
+        ViewFactory result = viewStack.pushWithAnimation(viewFactory, animatorFactory);
+        assertSame(viewFactory, result);
+
+        assertEquals(1, viewStack.size());
+        verify(container).addView(view);
+
+        ArgumentCaptor<FirstLayoutListener> firstLayoutListenerArgument =
+                ArgumentCaptor.forClass(FirstLayoutListener.class);
+
+        verify(observer).addOnGlobalLayoutListener(firstLayoutListenerArgument.capture());
+
+        firstLayoutListenerArgument.getValue().onFirstLayout(view);
+
+        ArgumentCaptor<Animator.AnimatorListener> animatorListenerArgument =
+                ArgumentCaptor.forClass(Animator.AnimatorListener.class);
+
+        verify(animator).addListener(animatorListenerArgument.capture());
+        verify(animator).start();
+
+        when(container.getChildCount()).thenReturn(1);
+        when(container.getChildAt(0)).thenReturn(view);
+
+        animatorListenerArgument.getValue().onAnimationEnd(animator);
+
+        verify(container).getChildCount();
+        verify(view, times(0)).setVisibility(View.GONE);
+    }
+
+    @Test
+    public void pushWithAnimationSecondTime() {
+        // Applies to both bottom and top
+        Context context = mock(Context.class);
+        when(container.getContext()).thenReturn(context);
+
+        // Bottom
+        View bottomView = mock(View.class);
+        ViewFactory bottomViewFactory = mock(ViewFactory.class);
+        ViewTreeObserver bottomObserver = mock(ViewTreeObserver.class);
+
+        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+        when(bottomView.getViewTreeObserver()).thenReturn(bottomObserver);
+
+        viewStack.push(bottomViewFactory);
+
+        // Top
+        View topView = mock(View.class);
+        ViewFactory topViewFactory = mock(ViewFactory.class);
+        ViewTreeObserver topObserver = mock(ViewTreeObserver.class);
+
+        when(topViewFactory.createView(context, container)).thenReturn(topView);
+        when(topView.getViewTreeObserver()).thenReturn(topObserver);
+
+        AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
+        Animator animator = mock(Animator.class);
+        when(animatorFactory.createAnimator(topView)).thenReturn(animator);
+
+        ViewFactory result = viewStack.pushWithAnimation(topViewFactory, animatorFactory);
+        assertSame(topViewFactory, result);
+
+        assertEquals(2, viewStack.size());
+        verify(container).addView(bottomView);
+        verify(container).addView(topView);
+
+        ArgumentCaptor<FirstLayoutListener> firstLayoutListenerArgument =
+                ArgumentCaptor.forClass(FirstLayoutListener.class);
+
+        verify(topObserver).addOnGlobalLayoutListener(firstLayoutListenerArgument.capture());
+
+        firstLayoutListenerArgument.getValue().onFirstLayout(topView);
+
+        ArgumentCaptor<Animator.AnimatorListener> animatorListenerArgument =
+                ArgumentCaptor.forClass(Animator.AnimatorListener.class);
+
+        verify(animator).addListener(animatorListenerArgument.capture());
+        verify(animator).start();
+
+        when(container.getChildCount()).thenReturn(2);
+        when(container.getChildAt(0)).thenReturn(bottomView);
+
+        animatorListenerArgument.getValue().onAnimationEnd(animator);
+
+        verify(bottomView).setVisibility(View.GONE);
     }
 
     @Test
@@ -228,7 +392,7 @@ public class ViewStackTest {
 
     @Test
     public void popWithSizeOne() {
-        viewStack.push(mock(ViewFactory.class));
+        viewStack.push(newMockViewFactory());
 
         ViewFactory result = viewStack.pop();
 
@@ -237,26 +401,76 @@ public class ViewStackTest {
     }
 
     @Test
-    public void popWithSizeGreaterThanOne() {
-        ViewFactory bottom = mock(ViewFactory.class);
+    public void popWithSizeMoreThanOne() {
         Context context = mock(Context.class);
-        View view = mock(View.class);
-        viewStack.push(bottom);
-
-        ViewFactory top = mock(ViewFactory.class);
-        viewStack.push(top);
-
-        reset(container);
-
         when(container.getContext()).thenReturn(context);
-        when(bottom.createView(context, container)).thenReturn(view);
+
+        ViewFactory bottomViewFactory = mock(ViewFactory.class);
+        View bottomView = mock(View.class);
+
+        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+
+        viewStack.push(bottomViewFactory);
+
+        ViewFactory topViewFactory = mock(ViewFactory.class);
+        View topView = mock(View.class);
+
+        when(topViewFactory.createView(context, container)).thenReturn(topView);
+
+        viewStack.push(topViewFactory);
+
+        when(container.getChildCount()).thenReturn(2);
+        when(container.getChildAt(0)).thenReturn(bottomView);
+        when(container.getChildAt(1)).thenReturn(topView);
 
         ViewFactory result = viewStack.pop();
+        assertSame(topViewFactory, result);
 
-        assertSame(top, result);
+        verify(bottomView).setVisibility(View.VISIBLE);
+        verify(container).removeView(topView);
+    }
 
-        verify(container).removeAllViews();
-        verify(container).addView(view);
+    @Test
+    public void popWithAnimation() {
+        Context context = mock(Context.class);
+        when(container.getContext()).thenReturn(context);
+
+        ViewFactory bottomViewFactory = mock(ViewFactory.class);
+        View bottomView = mock(View.class);
+
+        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+
+        viewStack.push(bottomViewFactory);
+
+        ViewFactory topViewFactory = mock(ViewFactory.class);
+        View topView = mock(View.class);
+
+        when(topViewFactory.createView(context, container)).thenReturn(topView);
+
+        viewStack.push(topViewFactory);
+
+        when(container.getChildCount()).thenReturn(2);
+        when(container.getChildAt(0)).thenReturn(bottomView);
+        when(container.getChildAt(1)).thenReturn(topView);
+
+        AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
+        Animator animator = mock(Animator.class);
+        when(animatorFactory.createAnimator(topView)).thenReturn(animator);
+
+        ViewFactory result = viewStack.popWithAnimation(animatorFactory);
+        assertSame(topViewFactory, result);
+
+        verify(bottomView).setVisibility(View.VISIBLE);
+
+        ArgumentCaptor<Animator.AnimatorListener> animatorListenerArgument =
+                ArgumentCaptor.forClass(Animator.AnimatorListener.class);
+
+        verify(animator).addListener(animatorListenerArgument.capture());
+        verify(animator).start();
+
+        animatorListenerArgument.getValue().onAnimationEnd(animator);
+
+        verify(container).removeView(topView);
     }
 
     @Test
@@ -271,10 +485,9 @@ public class ViewStackTest {
 
     @Test
     public void peek() {
-        ViewFactory bottom = mock(ViewFactory.class);
-        viewStack.push(bottom);
+        viewStack.push(newMockViewFactory());
 
-        ViewFactory top = mock(ViewFactory.class);
+        ViewFactory top = newMockViewFactory();
         viewStack.push(top);
 
         ViewFactory result = viewStack.peek();
@@ -284,22 +497,16 @@ public class ViewStackTest {
 
     @Test
     public void size() {
-        ViewFactory bottom = mock(ViewFactory.class);
-        viewStack.push(bottom);
-
-        ViewFactory top = mock(ViewFactory.class);
-        viewStack.push(top);
+        viewStack.push(newMockViewFactory());
+        viewStack.push(newMockViewFactory());
 
         assertEquals(2, viewStack.size());
     }
 
     @Test
     public void clear() {
-        ViewFactory bottom = mock(ViewFactory.class);
-        viewStack.push(bottom);
-
-        ViewFactory top = mock(ViewFactory.class);
-        viewStack.push(top);
+        viewStack.push(newMockViewFactory());
+        viewStack.push(newMockViewFactory());
 
         reset(container);
 
@@ -307,5 +514,18 @@ public class ViewStackTest {
 
         verify(container).removeAllViews();
         verifyNoMoreInteractions(container);
+    }
+
+    private ViewFactory newMockViewFactory() {
+        Context context = mock(Context.class);
+        View view = mock(View.class);
+        ViewFactory viewFactory = mock(ViewFactory.class);
+        ViewTreeObserver observer = mock(ViewTreeObserver.class);
+
+        when(container.getContext()).thenReturn(context);
+        when(viewFactory.createView(context, container)).thenReturn(view);
+        when(view.getViewTreeObserver()).thenReturn(observer);
+
+        return viewFactory;
     }
 }
