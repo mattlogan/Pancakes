@@ -80,10 +80,4 @@ public class GreenView extends RelativeLayout {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d("testing", "GreenView (" + hashCode() + ") onRestoreInstanceState");
     }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.d("testing", "onMeasure");
-    }
 }
