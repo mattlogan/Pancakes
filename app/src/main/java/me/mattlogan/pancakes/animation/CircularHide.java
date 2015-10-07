@@ -18,6 +18,7 @@ public class CircularHide implements AnimatorFactory {
         int initialRadius = view.getWidth();
 
         // create the animation (the final radius is zero)
-        return ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0)
+                .setDuration(400);
     }
 }

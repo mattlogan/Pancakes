@@ -18,6 +18,7 @@ public class CircularReveal implements AnimatorFactory {
         int finalRadius = Math.max(view.getWidth(), view.getHeight());
 
         // create the animator for this view (the start radius is zero)
-        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        return ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius)
+                .setDuration(400);
     }
 }
