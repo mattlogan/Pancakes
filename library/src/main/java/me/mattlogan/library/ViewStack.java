@@ -22,6 +22,7 @@ public final class ViewStack {
     private final Stack<ViewFactory> stack = new Stack<>();
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
+    private ViewStackChangedListener changedListener;
 
     /**
      * Static creation method for ViewStack instances
@@ -39,6 +40,11 @@ public final class ViewStack {
     private ViewStack(ViewGroup container, ViewStackDelegate delegate) {
         this.container = container;
         this.delegate = delegate;
+    }
+
+    public void addViewStackChangedListener(ViewStackChangedListener listener) {
+        //Not checking null so the listener can be removed by setting null.
+        this.changedListener = listener;
     }
 
     /**
@@ -67,8 +73,28 @@ public final class ViewStack {
         Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (ViewFactory viewFactory : savedStack) {
-            push(viewFactory);
+            push(viewFactory, true);
         }
+    }
+
+    /**
+     * Pushes a View, created by the provided ViewFactory, onto the navigation stack
+     *
+     * @param viewFactory responsible for the creation of the next View in the navigation stac
+     * @param skipChangeListener flag to skip sending any updates to the view stack change listener
+     *                           when rebuilding the view stack after rotation
+     * @return the provided ViewFactory (to comply with the Java Stack API)
+     */
+    private ViewFactory push(ViewFactory viewFactory, boolean skipChangeListener) {
+        checkNotNull(viewFactory, "viewFactory == null");
+        stack.push(viewFactory);
+        View view = viewFactory.createView(container.getContext(), container);
+        container.addView(view);
+        setBelowViewVisibility(View.GONE);
+        if(!skipChangeListener && changedListener != null) {
+            changedListener.onViewStackChanged();
+        }
+        return viewFactory;
     }
 
     /**
@@ -78,12 +104,7 @@ public final class ViewStack {
      * @return the provided ViewFactory (to comply with the Java Stack API)
      */
     public ViewFactory push(ViewFactory viewFactory) {
-        checkNotNull(viewFactory, "viewFactory == null");
-        stack.push(viewFactory);
-        View view = viewFactory.createView(container.getContext(), container);
-        container.addView(view);
-        setBelowViewVisibility(View.GONE);
-        return viewFactory;
+        return push(viewFactory, false);
     }
 
     /**
@@ -124,6 +145,9 @@ public final class ViewStack {
         ViewFactory popped = stack.pop();
         setBelowViewVisibility(View.VISIBLE);
         container.removeView(peekView());
+        if(changedListener != null) {
+            changedListener.onViewStackChanged();
+        }
         return popped;
     }
 
@@ -184,6 +208,9 @@ public final class ViewStack {
         @Override
         public void onAnimationEnd(Animator animator) {
             setBelowViewVisibility(View.GONE);
+            if(changedListener != null) {
+                changedListener.onViewStackChanged();
+            }
         }
     };
 
@@ -191,6 +218,9 @@ public final class ViewStack {
         @Override
         public void onAnimationEnd(Animator animator) {
             container.removeView(peekView());
+            if(changedListener != null) {
+                changedListener.onViewStackChanged();
+            }
         }
     };
 
