@@ -6,11 +6,12 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.ViewStack;
+import me.mattlogan.library.ViewStackChangedListener;
 import me.mattlogan.library.ViewStackDelegate;
 import me.mattlogan.pancakes.view.RedView;
 
 public class MainActivity extends AppCompatActivity
-        implements ViewStackActivity, ViewStackDelegate {
+        implements ViewStackActivity, ViewStackDelegate, ViewStackChangedListener {
 
     private static final String STACK_TAG = "stack";
 
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
+        viewStack.addViewStackChangedListener(this);
 
         if (savedInstanceState != null) {
             viewStack.rebuildFromBundle(savedInstanceState, STACK_TAG);
@@ -51,5 +53,10 @@ public class MainActivity extends AppCompatActivity
     public void finishStack() {
         Log.d("testing", "finishStack");
         finish();
+    }
+
+    @Override
+    public void onViewStackChanged() {
+        Log.d("testing", "onViewStackChanged");
     }
 }
