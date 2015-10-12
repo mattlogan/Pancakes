@@ -1,7 +1,7 @@
 Pancakes
 ----
 
-Like FragmentManager but for Views
+Pancakes is a View-based navigation stack library for Android. While it does aim to replace **some** of FragmentManager's functionality, its feature set is not one-to-one with that of FragmentManager, as Views and Fragments are inherently different. Unlike FragmentManager, it also supports the use of Animators for View transitions.
 
 Download
 ----
