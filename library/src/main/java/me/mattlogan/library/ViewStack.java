@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.List;
 import java.util.Stack;
 
 import static me.mattlogan.library.Preconditions.checkNotNull;
@@ -22,6 +24,7 @@ public final class ViewStack {
     private final Stack<ViewFactory> stack = new Stack<>();
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
+    private final List<StackChangedListener> listeners = new ArrayList<>();
 
     /**
      * Static creation method for ViewStack instances
@@ -67,8 +70,10 @@ public final class ViewStack {
         Stack<ViewFactory> savedStack = (Stack<ViewFactory>) bundle.getSerializable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (ViewFactory viewFactory : savedStack) {
-            push(viewFactory);
+            checkNotNull(viewFactory, "viewFactory == null");
+            pushWithoutNotifyingListeners(viewFactory);
         }
+        notifyListeners();
     }
 
     /**
@@ -79,11 +84,16 @@ public final class ViewStack {
      */
     public ViewFactory push(ViewFactory viewFactory) {
         checkNotNull(viewFactory, "viewFactory == null");
+        pushWithoutNotifyingListeners(viewFactory);
+        notifyListeners();
+        return viewFactory;
+    }
+
+    private void pushWithoutNotifyingListeners(ViewFactory viewFactory) {
         stack.push(viewFactory);
         View view = viewFactory.createView(container.getContext(), container);
         container.addView(view);
         setBelowViewVisibility(View.GONE);
-        return viewFactory;
     }
 
     /**
@@ -102,6 +112,7 @@ public final class ViewStack {
         stack.push(viewFactory);
         View view = viewFactory.createView(container.getContext(), container);
         container.addView(view);
+        notifyListeners();
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
             @Override
             public void onFirstLayout(View view) {
@@ -124,6 +135,7 @@ public final class ViewStack {
         ViewFactory popped = stack.pop();
         setBelowViewVisibility(View.VISIBLE);
         container.removeView(peekView());
+        notifyListeners();
         return popped;
     }
 
@@ -178,6 +190,34 @@ public final class ViewStack {
     public void clear() {
         stack.clear();
         container.removeAllViews();
+        notifyListeners();
+    }
+
+    /**
+     * Adds a StackChangedListener for stack-changed events
+     *
+     * @param listener A StackChangedListener
+     * @return always true
+     */
+    public boolean addStackChangedListener(StackChangedListener listener) {
+        return listeners.add(listener);
+    }
+
+    /**
+     * Removes the supplied StackChangedListener
+     *
+     * @param listener The StackChangedListener to remove
+     * @return true if the StackChangedListener was actually removed
+     */
+    public boolean removeStackChangedListener(StackChangedListener listener) {
+        return listeners.remove(listener);
+    }
+
+    /**
+     * Removes all StackChangedListeners
+     */
+    public void clearStackChangedListeners() {
+        listeners.clear();
     }
 
     private Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
@@ -191,6 +231,7 @@ public final class ViewStack {
         @Override
         public void onAnimationEnd(Animator animator) {
             container.removeView(peekView());
+            notifyListeners();
         }
     };
 
@@ -216,5 +257,11 @@ public final class ViewStack {
             return false;
         }
         return true;
+    }
+
+    private void notifyListeners() {
+        for (StackChangedListener listener : listeners) {
+            listener.onStackChanged();
+        }
     }
 }
