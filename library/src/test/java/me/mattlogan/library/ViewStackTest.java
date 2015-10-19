@@ -40,12 +40,17 @@ public class ViewStackTest {
     @Mock ViewStackDelegate delegate;
     @Mock ViewGroup container;
 
+    @Mock StackChangedListener stackChangedListener1;
+    @Mock StackChangedListener stackChangedListener2;
+
     ViewStack viewStack;
 
     @Before
     public void setup() {
         initMocks(this);
         viewStack = ViewStack.create(container, delegate);
+        viewStack.addStackChangedListener(stackChangedListener1);
+        viewStack.addStackChangedListener(stackChangedListener2);
     }
 
     @Test
@@ -154,6 +159,9 @@ public class ViewStackTest {
 
     @Test
     public void rebuildFromBundle() {
+        StackChangedListener stackChangedListener = mock(StackChangedListener.class);
+        viewStack.addStackChangedListener(stackChangedListener);
+
         Stack<ViewFactory> stack = new Stack<>();
 
         Context context = mock(Context.class);
@@ -195,6 +203,7 @@ public class ViewStackTest {
         verify(container).addView(bottomView);
         verify(container).addView(topView);
         verify(bottomView).setVisibility(View.GONE);
+        verifyStackChangedListenersNotified(1);
     }
 
     @Test
@@ -209,6 +218,9 @@ public class ViewStackTest {
 
     @Test
     public void pushFirstTime() {
+        StackChangedListener stackChangedListener = mock(StackChangedListener.class);
+        viewStack.addStackChangedListener(stackChangedListener);
+
         // Applies to both bottom and top
         Context context = mock(Context.class);
         when(container.getContext()).thenReturn(context);
@@ -225,6 +237,7 @@ public class ViewStackTest {
 
         assertEquals(1, viewStack.size());
         verify(container).addView(view);
+        verifyStackChangedListenersNotified(1);
     }
 
     @Test
@@ -256,6 +269,7 @@ public class ViewStackTest {
         verify(container).addView(bottomView);
         verify(container).addView(topView);
         verify(bottomView).setVisibility(View.GONE);
+        verifyStackChangedListenersNotified(2);
     }
 
     @Test
@@ -301,6 +315,8 @@ public class ViewStackTest {
 
         assertEquals(1, viewStack.size());
         verify(container).addView(view);
+
+        verifyStackChangedListenersNotified(1);
 
         ArgumentCaptor<FirstLayoutListener> firstLayoutListenerArgument =
                 ArgumentCaptor.forClass(FirstLayoutListener.class);
@@ -358,6 +374,8 @@ public class ViewStackTest {
         assertEquals(2, viewStack.size());
         verify(container).addView(bottomView);
         verify(container).addView(topView);
+
+        verifyStackChangedListenersNotified(2);
 
         ArgumentCaptor<FirstLayoutListener> firstLayoutListenerArgument =
                 ArgumentCaptor.forClass(FirstLayoutListener.class);
@@ -428,6 +446,8 @@ public class ViewStackTest {
 
         verify(bottomView).setVisibility(View.VISIBLE);
         verify(container).removeView(topView);
+
+        verifyStackChangedListenersNotified(3);
     }
 
     @Test
@@ -471,6 +491,8 @@ public class ViewStackTest {
         animatorListenerArgument.getValue().onAnimationEnd(animator);
 
         verify(container).removeView(topView);
+
+        verifyStackChangedListenersNotified(3);
     }
 
     @Test
@@ -514,6 +536,8 @@ public class ViewStackTest {
 
         verify(container).removeAllViews();
         verifyNoMoreInteractions(container);
+
+        verifyStackChangedListenersNotified(3);
     }
 
     private ViewFactory newMockViewFactory() {
@@ -527,5 +551,10 @@ public class ViewStackTest {
         when(view.getViewTreeObserver()).thenReturn(observer);
 
         return viewFactory;
+    }
+
+    private void verifyStackChangedListenersNotified(int times) {
+        verify(stackChangedListener1, times(times)).onStackChanged();
+        verify(stackChangedListener2, times(times)).onStackChanged();
     }
 }
