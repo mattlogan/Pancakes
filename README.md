@@ -7,7 +7,7 @@ Download
 ----
 
 ```java
-compile 'me.mattlogan.pancakes:pancakes:3.0.0'
+compile 'me.mattlogan.pancakes:pancakes:3.1.0'
 ```
 
 Usage
@@ -59,6 +59,14 @@ public class CircularReveal implements AnimatorFactory {
 ```
 
 You can also call `peek()` and `peekView()` to get the `ViewFactory` and `View` at the top of the navigation stack.
+
+Add a `StackChangedListener` (or several!) if you want to be notified of changes in the navigation stack:
+
+```java
+viewStack.addStackChangedListener(listener);
+```
+
+You can also remove individual listeners with `removeStackChangedListener(StackChangedListener)` or remove all of them with `clearStackChangedListeners()`.
 
 Persist `ViewFactory` instances, in order, across configuration changes:
 
