@@ -34,6 +34,8 @@ public class BlueView extends RelativeLayout {
         super.onFinishInflate();
         Log.d("testing", "BlueView (" + hashCode() + ") onFinishInflate");
 
+        if (!(getContext() instanceof ViewStackActivity)) return;
+
         final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
         findViewById(R.id.blue_button_back).setOnClickListener(new OnClickListener() {
