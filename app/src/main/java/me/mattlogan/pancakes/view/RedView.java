@@ -4,25 +4,15 @@ import android.content.Context;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
-import me.mattlogan.pancakes.animation.CircularReveal;
 import me.mattlogan.pancakes.R;
 import me.mattlogan.pancakes.ViewStackActivity;
+import me.mattlogan.pancakes.animation.CircularReveal;
 
 public class RedView extends RelativeLayout {
-
-    public static class Factory implements ViewFactory {
-        @Override
-        public View createView(Context context, ViewGroup container) {
-            return LayoutInflater.from(context).inflate(R.layout.view_red, container, false);
-        }
-    }
 
     public RedView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -48,7 +38,7 @@ public class RedView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "RedView pushing GreenView");
-                viewStack.pushWithAnimation(new GreenView.Factory(), new CircularReveal());
+                viewStack.pushWithAnimation(R.layout.view_green, new CircularReveal());
             }
         });
     }

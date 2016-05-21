@@ -9,21 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
-import me.mattlogan.pancakes.animation.CircularHide;
-import me.mattlogan.pancakes.animation.CircularReveal;
 import me.mattlogan.pancakes.R;
 import me.mattlogan.pancakes.ViewStackActivity;
+import me.mattlogan.pancakes.animation.CircularHide;
+import me.mattlogan.pancakes.animation.CircularReveal;
 
 public class GreenView extends RelativeLayout {
-
-    public static class Factory implements ViewFactory {
-        @Override
-        public View createView(Context context, ViewGroup container) {
-            return LayoutInflater.from(context).inflate(R.layout.view_green, container, false);
-        }
-    }
 
     public GreenView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,7 +41,7 @@ public class GreenView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "GreenView pushing BlueView");
-                viewStack.pushWithAnimation(new BlueView.Factory(), new CircularReveal());
+                viewStack.pushWithAnimation(R.layout.view_blue, new CircularReveal());
             }
         });
     }

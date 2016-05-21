@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             viewStack.rebuildFromBundle(savedInstanceState, STACK_TAG);
         } else {
-            viewStack.push(new RedView.Factory());
+            viewStack.push(R.layout.view_red);
         }
     }
 

@@ -9,20 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import me.mattlogan.library.ViewFactory;
 import me.mattlogan.library.ViewStack;
 import me.mattlogan.pancakes.animation.CircularHide;
 import me.mattlogan.pancakes.R;
 import me.mattlogan.pancakes.ViewStackActivity;
 
 public class BlueView extends RelativeLayout {
-
-    public static class Factory implements ViewFactory {
-        @Override
-        public View createView(Context context, ViewGroup container) {
-            return LayoutInflater.from(context).inflate(R.layout.view_blue, container, false);
-        }
-    }
 
     public BlueView(Context context, AttributeSet attrs) {
         super(context, attrs);

@@ -3,6 +3,7 @@ package me.mattlogan.library;
 import android.animation.Animator;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -15,11 +16,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.EmptyStackException;
-import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
@@ -37,15 +36,21 @@ public class ViewStackTest {
     @Mock ViewStackDelegate delegate;
     @Mock ViewGroup container;
 
+
     @Mock StackChangedListener stackChangedListener1;
     @Mock StackChangedListener stackChangedListener2;
 
+    @Mock
+    PancakesViewInflator mockLayoutInflator;
+
     ViewStack viewStack;
+    @LayoutRes int BOTTOM_LAYOUT_RES = 8675309;
+    @LayoutRes int TOP_LAYOUT_RES = 42;
 
     @Before
     public void setup() {
         initMocks(this);
-        viewStack = ViewStack.create(container, delegate);
+        viewStack = ViewStack.create(container, delegate, mockLayoutInflator);
         viewStack.addStackChangedListener(stackChangedListener1);
         viewStack.addStackChangedListener(stackChangedListener2);
     }
@@ -104,11 +109,11 @@ public class ViewStackTest {
 
     @Test
     public void saveToBundle() {
-        viewStack.push(newMockViewFactory());
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
         Bundle bundle = mock(Bundle.class);
         viewStack.saveToBundle(bundle, "tag");
-        verify(bundle).putSerializable(eq("tag"), isA(Stack.class));
+        verify(bundle).putParcelable(eq("tag"), isA(ParcelableIntStack.class));
     }
 
     @Test
@@ -159,22 +164,19 @@ public class ViewStackTest {
         StackChangedListener stackChangedListener = mock(StackChangedListener.class);
         viewStack.addStackChangedListener(stackChangedListener);
 
-        Stack<ViewFactory> stack = new Stack<>();
+        ParcelableIntStack stack = new ParcelableIntStack();
 
         Context context = mock(Context.class);
         when(container.getContext()).thenReturn(context);
 
-        ViewFactory bottom = mock(ViewFactory.class);
         View bottomView = mock(View.class);
-        when(bottom.createView(context, container)).thenReturn(bottomView);
-        when(bottomView.getViewTreeObserver()).thenReturn(mock(ViewTreeObserver.class));
-        stack.push(bottom);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
-        ViewFactory top = mock(ViewFactory.class);
         View topView = mock(View.class);
-        when(top.createView(context, container)).thenReturn(topView);
-        when(topView.getViewTreeObserver()).thenReturn(mock(ViewTreeObserver.class));
-        stack.push(top);
+        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+
+        stack.push(BOTTOM_LAYOUT_RES);
+        stack.push(TOP_LAYOUT_RES);
 
         // First time return 1, second time return 2
         when(container.getChildCount()).thenAnswer(new Answer() {
@@ -189,10 +191,11 @@ public class ViewStackTest {
             }
         });
 
+        // todo: FIGURE THIS OUT
         when(container.getChildAt(0)).thenReturn(bottomView);
 
         Bundle bundle = mock(Bundle.class);
-        when(bundle.getSerializable("tag")).thenReturn(stack);
+        when(bundle.getParcelable("tag")).thenReturn(stack);
 
         viewStack.rebuildFromBundle(bundle, "tag");
 
@@ -203,15 +206,6 @@ public class ViewStackTest {
         verifyStackChangedListenersNotified(1);
     }
 
-    @Test
-    public void pushWithNullViewFactory() {
-        try {
-            viewStack.push(null);
-            fail();
-        } catch (NullPointerException e) {
-            assertEquals("viewFactory == null", e.getMessage());
-        }
-    }
 
     @Test
     public void pushFirstTime() {
@@ -224,13 +218,11 @@ public class ViewStackTest {
 
         // Bottom
         View view = mock(View.class);
-        ViewFactory viewFactory = mock(ViewFactory.class);
-
-        when(viewFactory.createView(context, container)).thenReturn(view);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
 
         when(container.getChildCount()).thenReturn(1);
 
-        viewStack.push(viewFactory);
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
         assertEquals(1, viewStack.size());
         verify(container).addView(view);
@@ -245,22 +237,20 @@ public class ViewStackTest {
 
         // Bottom
         View bottomView = mock(View.class);
-        ViewFactory bottomViewFactory = mock(ViewFactory.class);
 
-        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
-        viewStack.push(bottomViewFactory);
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
         // Top
         View topView = mock(View.class);
-        ViewFactory topViewFactory = mock(ViewFactory.class);
 
-        when(topViewFactory.createView(context, container)).thenReturn(topView);
+        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
         when(container.getChildCount()).thenReturn(2);
         when(container.getChildAt(0)).thenReturn(bottomView);
 
-        viewStack.push(topViewFactory);
+        viewStack.push(TOP_LAYOUT_RES);
 
         assertEquals(2, viewStack.size());
         verify(container).addView(bottomView);
@@ -270,19 +260,9 @@ public class ViewStackTest {
     }
 
     @Test
-    public void pushWithAnimationWithNullViewFactory() {
-        try {
-            viewStack.pushWithAnimation(null, mock(AnimatorFactory.class));
-            fail();
-        } catch (NullPointerException e) {
-            assertEquals("viewFactory == null", e.getMessage());
-        }
-    }
-
-    @Test
     public void pushWithAnimationWithNullAnimatorFactory() {
         try {
-            viewStack.pushWithAnimation(mock(ViewFactory.class), null);
+            viewStack.pushWithAnimation(BOTTOM_LAYOUT_RES, null);
             fail();
         } catch (NullPointerException e) {
             assertEquals("animatorFactory == null", e.getMessage());
@@ -297,18 +277,17 @@ public class ViewStackTest {
 
         // Top
         View view = mock(View.class);
-        ViewFactory viewFactory = mock(ViewFactory.class);
         ViewTreeObserver observer = mock(ViewTreeObserver.class);
 
-        when(viewFactory.createView(context, container)).thenReturn(view);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
         when(view.getViewTreeObserver()).thenReturn(observer);
 
         AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
         Animator animator = mock(Animator.class);
         when(animatorFactory.createAnimator(view)).thenReturn(animator);
 
-        ViewFactory result = viewStack.pushWithAnimation(viewFactory, animatorFactory);
-        assertSame(viewFactory, result);
+        int result = viewStack.pushWithAnimation(BOTTOM_LAYOUT_RES, animatorFactory);
+        assertEquals(result, BOTTOM_LAYOUT_RES);
 
         assertEquals(1, viewStack.size());
         verify(container).addView(view);
@@ -345,28 +324,26 @@ public class ViewStackTest {
 
         // Bottom
         View bottomView = mock(View.class);
-        ViewFactory bottomViewFactory = mock(ViewFactory.class);
         ViewTreeObserver bottomObserver = mock(ViewTreeObserver.class);
 
-        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
         when(bottomView.getViewTreeObserver()).thenReturn(bottomObserver);
 
-        viewStack.push(bottomViewFactory);
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
         // Top
         View topView = mock(View.class);
-        ViewFactory topViewFactory = mock(ViewFactory.class);
         ViewTreeObserver topObserver = mock(ViewTreeObserver.class);
 
-        when(topViewFactory.createView(context, container)).thenReturn(topView);
+        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
         when(topView.getViewTreeObserver()).thenReturn(topObserver);
 
         AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
         Animator animator = mock(Animator.class);
         when(animatorFactory.createAnimator(topView)).thenReturn(animator);
 
-        ViewFactory result = viewStack.pushWithAnimation(topViewFactory, animatorFactory);
-        assertSame(topViewFactory, result);
+        int result = viewStack.pushWithAnimation(TOP_LAYOUT_RES, animatorFactory);
+        assertEquals(TOP_LAYOUT_RES, result);
 
         assertEquals(2, viewStack.size());
         verify(container).addView(bottomView);
@@ -407,11 +384,11 @@ public class ViewStackTest {
 
     @Test
     public void popWithSizeOne() {
-        viewStack.push(newMockViewFactory());
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
-        ViewFactory result = viewStack.pop();
+        int result = viewStack.pop();
 
-        assertNull(result);
+        assertEquals(ViewStack.SINGLE_VIEW, result);
         verify(delegate).finishStack();
     }
 
@@ -420,26 +397,24 @@ public class ViewStackTest {
         Context context = mock(Context.class);
         when(container.getContext()).thenReturn(context);
 
-        ViewFactory bottomViewFactory = mock(ViewFactory.class);
         View bottomView = mock(View.class);
 
-        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
-        viewStack.push(bottomViewFactory);
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
-        ViewFactory topViewFactory = mock(ViewFactory.class);
         View topView = mock(View.class);
 
-        when(topViewFactory.createView(context, container)).thenReturn(topView);
+        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
-        viewStack.push(topViewFactory);
+        viewStack.push(TOP_LAYOUT_RES);
 
         when(container.getChildCount()).thenReturn(2);
         when(container.getChildAt(0)).thenReturn(bottomView);
         when(container.getChildAt(1)).thenReturn(topView);
 
-        ViewFactory result = viewStack.pop();
-        assertSame(topViewFactory, result);
+        int result = viewStack.pop();
+        assertSame(TOP_LAYOUT_RES, result);
 
         verify(bottomView).setVisibility(View.VISIBLE);
         verify(container).removeView(topView);
@@ -452,19 +427,17 @@ public class ViewStackTest {
         Context context = mock(Context.class);
         when(container.getContext()).thenReturn(context);
 
-        ViewFactory bottomViewFactory = mock(ViewFactory.class);
         View bottomView = mock(View.class);
 
-        when(bottomViewFactory.createView(context, container)).thenReturn(bottomView);
+        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
-        viewStack.push(bottomViewFactory);
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
-        ViewFactory topViewFactory = mock(ViewFactory.class);
         View topView = mock(View.class);
 
-        when(topViewFactory.createView(context, container)).thenReturn(topView);
+        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
-        viewStack.push(topViewFactory);
+        viewStack.push(TOP_LAYOUT_RES);
 
         when(container.getChildCount()).thenReturn(2);
         when(container.getChildAt(0)).thenReturn(bottomView);
@@ -474,8 +447,8 @@ public class ViewStackTest {
         Animator animator = mock(Animator.class);
         when(animatorFactory.createAnimator(topView)).thenReturn(animator);
 
-        ViewFactory result = viewStack.popWithAnimation(animatorFactory);
-        assertSame(topViewFactory, result);
+        int result = viewStack.popWithAnimation(animatorFactory);
+        assertSame(TOP_LAYOUT_RES, result);
 
         verify(bottomView).setVisibility(View.VISIBLE);
 
@@ -504,28 +477,27 @@ public class ViewStackTest {
 
     @Test
     public void peek() {
-        viewStack.push(newMockViewFactory());
+        viewStack.push(BOTTOM_LAYOUT_RES);
 
-        ViewFactory top = newMockViewFactory();
-        viewStack.push(top);
+        viewStack.push(TOP_LAYOUT_RES);
 
-        ViewFactory result = viewStack.peek();
+        int result = viewStack.peek();
 
-        assertSame(top, result);
+        assertSame(TOP_LAYOUT_RES, result);
     }
 
     @Test
     public void size() {
-        viewStack.push(newMockViewFactory());
-        viewStack.push(newMockViewFactory());
+        viewStack.push(BOTTOM_LAYOUT_RES);
+        viewStack.push(TOP_LAYOUT_RES);
 
         assertEquals(2, viewStack.size());
     }
 
     @Test
     public void clear() {
-        viewStack.push(newMockViewFactory());
-        viewStack.push(newMockViewFactory());
+        viewStack.push(BOTTOM_LAYOUT_RES);
+        viewStack.push(TOP_LAYOUT_RES);
 
         reset(container);
 
@@ -535,19 +507,6 @@ public class ViewStackTest {
         verifyNoMoreInteractions(container);
 
         verifyStackChangedListenersNotified(3);
-    }
-
-    private ViewFactory newMockViewFactory() {
-        Context context = mock(Context.class);
-        View view = mock(View.class);
-        ViewFactory viewFactory = mock(ViewFactory.class);
-        ViewTreeObserver observer = mock(ViewTreeObserver.class);
-
-        when(container.getContext()).thenReturn(context);
-        when(viewFactory.createView(context, container)).thenReturn(view);
-        when(view.getViewTreeObserver()).thenReturn(observer);
-
-        return viewFactory;
     }
 
     private void verifyStackChangedListenersNotified(int times) {
