@@ -7,6 +7,6 @@ import android.view.ViewGroup;
 /**
  * A simple interface which allows us to mock the process of inflating views for testing.
  */
-interface PancakesViewInflator {
+interface PancakesViewInflater {
     View inflateView(@LayoutRes int layoutResource, ViewGroup container);
 }

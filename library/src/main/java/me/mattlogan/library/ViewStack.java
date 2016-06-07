@@ -27,45 +27,50 @@ public final class ViewStack {
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
     private final List<StackChangedListener> listeners = new ArrayList<>();
-    private final PancakesViewInflator pancakesViewInflator;
+    private final PancakesViewInflater pancakesViewInflater;
 
     /**
      * Static creation method for ViewStack instances
      *
-     * @param container Any {@link ViewGroup} container for navigation Views. Typically a FrameLayout
+     * @param container Any {@link ViewGroup} container for navigation Views. Typically a
+     *                  FrameLayout
      * @param delegate  A {@link ViewStackDelegate} responsible for "finishing" the navigation stack
      * @return A new ViewStack instance
      */
     public static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
-        return create(container, delegate, new PancakesViewInflator() {
+        return create(container, delegate, new PancakesViewInflater() {
             @Override
             public View inflateView(@LayoutRes int layoutResource, ViewGroup container) {
-                return LayoutInflater.from(container.getContext()).inflate(layoutResource, container, false);
+                return LayoutInflater.from(container.getContext())
+                        .inflate(layoutResource, container, false);
             }
         });
     }
 
     /**
      * Package-private factory method which allows us to provide a custom
-     * {@link PancakesViewInflator} for testing.
+     * {@link PancakesViewInflater} for testing.
      *
-     * @param container Any {@link ViewGroup} container for navigation Views.  Typically a FrameLayout
-     * @param delegate A {@link ViewStackDelegate} responsible for "finishing" the navigation stack
-     * @param pancakesViewInflator A {@link PancakesViewInflator} which is responsible for inflating
+     * @param container            Any {@link ViewGroup} container for navigation Views.  Typically
+     *                             a FrameLayout
+     * @param delegate             A {@link ViewStackDelegate} responsible for "finishing" the
+     *                             navigation stack
+     * @param pancakesViewInflater A {@link PancakesViewInflater} which is responsible for inflating
      *                             layout resources into the container.
-     *
      * @return A new ViewStack instance
      */
-    static ViewStack create(ViewGroup container, ViewStackDelegate delegate, PancakesViewInflator pancakesViewInflator) {
+    static ViewStack create(ViewGroup container, ViewStackDelegate delegate,
+                            PancakesViewInflater pancakesViewInflater) {
         checkNotNull(container, "container == null");
         checkNotNull(delegate, "delegate == null");
-        return new ViewStack(container, delegate, pancakesViewInflator);
+        return new ViewStack(container, delegate, pancakesViewInflater);
     }
 
-    private ViewStack(ViewGroup container, ViewStackDelegate delegate, PancakesViewInflator inflator) {
+    private ViewStack(ViewGroup container, ViewStackDelegate delegate,
+                      PancakesViewInflater inflater) {
         this.container = container;
         this.delegate = delegate;
-        this.pancakesViewInflator = inflator;
+        this.pancakesViewInflater = inflater;
     }
 
     /**
@@ -91,7 +96,6 @@ public final class ViewStack {
     public void rebuildFromBundle(Bundle bundle, String tag) {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
-        // TODO: do the things!
         ParcelableIntStack savedStack = bundle.getParcelable(tag);
         checkNotNull(savedStack, "Bundle doesn't contain any ViewStack state.");
         for (Integer layoutResource : savedStack) {
@@ -114,7 +118,7 @@ public final class ViewStack {
 
     private void pushWithoutNotifyingListeners(@LayoutRes int layoutId) {
         stack.push(layoutId);
-        View view = pancakesViewInflator.inflateView(layoutId, container);
+        View view = pancakesViewInflater.inflateView(layoutId, container);
         container.addView(view);
         setBelowViewVisibility(View.GONE);
     }
@@ -138,16 +142,16 @@ public final class ViewStack {
      * Pushes a View, created with the provided layout id, onto the navigation stack and animates
      * it using the Animator created by the provided {@link AnimatorFactory}
      *
-     * @param layoutId     The id of the view to be added to the top of the navigation stack
+     * @param layoutId        The id of the view to be added to the top of the navigation stack
      * @param animatorFactory responsible for the creation of an Animator to animate the next View
      *                        onto the navigation stack
      * @return the provided layout id (to comply with the Java Stack API)
      */
     public int pushWithAnimation(@LayoutRes int layoutId,
-                                         final AnimatorFactory animatorFactory) {
+                                 final AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(layoutId);
-        View view = pancakesViewInflator.inflateView(layoutId, container);
+        View view = pancakesViewInflater.inflateView(layoutId, container);
         container.addView(view);
         notifyListeners();
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {

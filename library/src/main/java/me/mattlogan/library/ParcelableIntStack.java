@@ -8,13 +8,12 @@ import java.util.Stack;
 /**
  * It's a normal Stack of ints.  Only Parcelable!
  */
-public class ParcelableIntStack extends Stack<Integer> implements Parcelable {
+class ParcelableIntStack extends Stack<Integer> implements Parcelable {
 
-    public ParcelableIntStack() {
-        super();
+    ParcelableIntStack() {
     }
 
-    protected ParcelableIntStack(Parcel in) {
+    private ParcelableIntStack(Parcel in) {
         int[] elements = in.createIntArray();
         for (int i = elements.length; i >= 0; i--) {
             push(elements[i]);

@@ -36,21 +36,20 @@ public class ViewStackTest {
     @Mock ViewStackDelegate delegate;
     @Mock ViewGroup container;
 
-
     @Mock StackChangedListener stackChangedListener1;
     @Mock StackChangedListener stackChangedListener2;
 
-    @Mock
-    PancakesViewInflator mockLayoutInflator;
+    @Mock PancakesViewInflater layoutInflater;
 
     ViewStack viewStack;
+
     @LayoutRes int BOTTOM_LAYOUT_RES = 8675309;
     @LayoutRes int TOP_LAYOUT_RES = 42;
 
     @Before
     public void setup() {
         initMocks(this);
-        viewStack = ViewStack.create(container, delegate, mockLayoutInflator);
+        viewStack = ViewStack.create(container, delegate, layoutInflater);
         viewStack.addStackChangedListener(stackChangedListener1);
         viewStack.addStackChangedListener(stackChangedListener2);
     }
@@ -170,10 +169,10 @@ public class ViewStackTest {
         when(container.getContext()).thenReturn(context);
 
         View bottomView = mock(View.class);
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
         View topView = mock(View.class);
-        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+        when(layoutInflater.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
         stack.push(BOTTOM_LAYOUT_RES);
         stack.push(TOP_LAYOUT_RES);
@@ -218,7 +217,7 @@ public class ViewStackTest {
 
         // Bottom
         View view = mock(View.class);
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
 
         when(container.getChildCount()).thenReturn(1);
 
@@ -238,14 +237,14 @@ public class ViewStackTest {
         // Bottom
         View bottomView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
         viewStack.push(BOTTOM_LAYOUT_RES);
 
         // Top
         View topView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+        when(layoutInflater.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
         when(container.getChildCount()).thenReturn(2);
         when(container.getChildAt(0)).thenReturn(bottomView);
@@ -279,7 +278,7 @@ public class ViewStackTest {
         View view = mock(View.class);
         ViewTreeObserver observer = mock(ViewTreeObserver.class);
 
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(view);
         when(view.getViewTreeObserver()).thenReturn(observer);
 
         AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
@@ -326,7 +325,7 @@ public class ViewStackTest {
         View bottomView = mock(View.class);
         ViewTreeObserver bottomObserver = mock(ViewTreeObserver.class);
 
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
         when(bottomView.getViewTreeObserver()).thenReturn(bottomObserver);
 
         viewStack.push(BOTTOM_LAYOUT_RES);
@@ -335,7 +334,7 @@ public class ViewStackTest {
         View topView = mock(View.class);
         ViewTreeObserver topObserver = mock(ViewTreeObserver.class);
 
-        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+        when(layoutInflater.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
         when(topView.getViewTreeObserver()).thenReturn(topObserver);
 
         AnimatorFactory animatorFactory = mock(AnimatorFactory.class);
@@ -399,13 +398,13 @@ public class ViewStackTest {
 
         View bottomView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
         viewStack.push(BOTTOM_LAYOUT_RES);
 
         View topView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+        when(layoutInflater.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
         viewStack.push(TOP_LAYOUT_RES);
 
@@ -429,13 +428,13 @@ public class ViewStackTest {
 
         View bottomView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
+        when(layoutInflater.inflateView(BOTTOM_LAYOUT_RES, container)).thenReturn(bottomView);
 
         viewStack.push(BOTTOM_LAYOUT_RES);
 
         View topView = mock(View.class);
 
-        when(mockLayoutInflator.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
+        when(layoutInflater.inflateView(TOP_LAYOUT_RES, container)).thenReturn(topView);
 
         viewStack.push(TOP_LAYOUT_RES);
 
