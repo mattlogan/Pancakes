@@ -190,7 +190,6 @@ public class ViewStackTest {
             }
         });
 
-        // todo: FIGURE THIS OUT
         when(container.getChildAt(0)).thenReturn(bottomView);
 
         Bundle bundle = mock(Bundle.class);
