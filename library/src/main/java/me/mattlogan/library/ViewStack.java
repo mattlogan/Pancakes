@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,31 +90,33 @@ public final class ViewStack {
      * @param layoutId The layout id to inflate into the parent {@link ViewGroup}.
      * @return the provided layout id
      */
-    public int push(@LayoutRes int layoutId) {
-        pushWithoutNotifyingListeners(layoutId);
+    public View push(@LayoutRes int layoutId) {
+        View pushed = pushWithoutNotifyingListeners(layoutId);
         notifyListeners();
-        return layoutId;
+        return pushed;
     }
 
-    private void pushWithoutNotifyingListeners(@LayoutRes int layoutId) {
+    private View pushWithoutNotifyingListeners(@LayoutRes int layoutId) {
         stack.push(layoutId);
-        inflater.inflate(layoutId, container, true);
+        View pushed = inflater.inflate(layoutId, container, true);
         setBelowViewVisibility(View.GONE);
+        return pushed;
     }
 
     /**
      * Pops the top View off the navigation stack
      *
-     * @return The id of the layout on the top of the stack, or SINGLE_VIEW if the stack is to
-     * be finished.
+     * @return The popped View from the top of the stack, or null if the top View is the last
      */
-    public int pop() {
-        if (!shouldPop()) return SINGLE_VIEW;
-        int layoutId = stack.pop();
+    @Nullable
+    public View pop() {
+        if (!shouldPop()) return null;
+        stack.pop();
         setBelowViewVisibility(View.VISIBLE);
-        container.removeView(peekView());
+        View popped = peekView();
+        container.removeView(popped);
         notifyListeners();
-        return layoutId;
+        return popped;
     }
 
     /**
@@ -125,13 +128,13 @@ public final class ViewStack {
      *                        onto the navigation stack
      * @return the provided layout id (to comply with the Java Stack API)
      */
-    public int pushWithAnimation(@LayoutRes int layoutId,
+    public View pushWithAnimation(@LayoutRes int layoutId,
                                  final AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(layoutId);
-        View view = inflater.inflate(layoutId, container, true);
+        View pushed = inflater.inflate(layoutId, container, true);
         notifyListeners();
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
+        pushed.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(pushed) {
             @Override
             public void onFirstLayout(View view) {
                 // We have to wait until the View's first layout pass to start the animation,
@@ -139,7 +142,7 @@ public final class ViewStack {
                 startAnimation(animatorFactory, view, pushAnimatorListener);
             }
         });
-        return layoutId;
+        return pushed;
     }
 
     /**
@@ -148,15 +151,16 @@ public final class ViewStack {
      *
      * @param animatorFactory responsible for the creation of an Animator to animate the current
      *                        View off the navigation stack
-     * @return the layout id that was used for the creation of the top View on the
-     * navigation stack
+     * @return The popped View from the top of the stack, or null if the top View is the last
      */
-    public int popWithAnimation(AnimatorFactory animatorFactory) {
+    @Nullable
+    public View popWithAnimation(AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
-        if (!shouldPop()) return SINGLE_VIEW;
-        int popped = stack.pop();
+        if (!shouldPop()) return null;
+        stack.pop();
         setBelowViewVisibility(View.VISIBLE);
-        startAnimation(animatorFactory, peekView(), popAnimationListener);
+        View popped = peekView();
+        startAnimation(animatorFactory, popped, popAnimationListener);
         return popped;
     }
 

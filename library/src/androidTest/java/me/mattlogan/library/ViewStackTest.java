@@ -208,9 +208,8 @@ public class ViewStackTest {
     public void pushWithAnimationFirstTime() {
         AnimatorFactory animatorFactory = AnimatorFactory.NONE;
 
-        int result = viewStack.pushWithAnimation(BOTTOM_LAYOUT_RES, animatorFactory);
+        viewStack.pushWithAnimation(BOTTOM_LAYOUT_RES, animatorFactory);
         viewStack.pushAnimatorListener.onAnimationEnd(null);
-        assertEquals(result, BOTTOM_LAYOUT_RES);
 
         assertNumberOfViews(1);
         assertBottomViewIsCorrectType();
@@ -222,9 +221,8 @@ public class ViewStackTest {
     public void pushWithAnimationSecondTime() {
         viewStack.push(BOTTOM_LAYOUT_RES);
 
-        int result = viewStack.pushWithAnimation(TOP_LAYOUT_RES, AnimatorFactory.NONE);
+        viewStack.pushWithAnimation(TOP_LAYOUT_RES, AnimatorFactory.NONE);
         viewStack.pushAnimatorListener.onAnimationEnd(null);
-        assertEquals(result, TOP_LAYOUT_RES);
 
         assertNumberOfViews(2);
         assertBottomViewIsCorrectType();
@@ -249,9 +247,8 @@ public class ViewStackTest {
     public void popWithSizeOne() {
         viewStack.push(BOTTOM_LAYOUT_RES);
 
-        int result = viewStack.pop();
+        viewStack.pop();
 
-        assertEquals(ViewStack.SINGLE_VIEW, result);
         verify(delegate).finishStack();
     }
 
@@ -260,9 +257,8 @@ public class ViewStackTest {
         viewStack.push(BOTTOM_LAYOUT_RES);
         viewStack.push(TOP_LAYOUT_RES);
 
-        int result = viewStack.pop();
+        viewStack.pop();
 
-        assertEquals(TOP_LAYOUT_RES, result);
         assertNumberOfViews(1);
         assertBottomViewIsCorrectType();
         verifyStackChangedListenersNotified(3);
@@ -273,9 +269,8 @@ public class ViewStackTest {
         viewStack.push(BOTTOM_LAYOUT_RES);
         viewStack.push(TOP_LAYOUT_RES);
 
-        int result = viewStack.popWithAnimation(AnimatorFactory.NONE);
+        viewStack.popWithAnimation(AnimatorFactory.NONE);
         viewStack.popAnimationListener.onAnimationEnd(null);
-        assertEquals(TOP_LAYOUT_RES, result);
         assertNumberOfViews(1);
         verifyStackChangedListenersNotified(3);
     }
