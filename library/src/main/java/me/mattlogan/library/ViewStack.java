@@ -23,54 +23,33 @@ import static me.mattlogan.library.Preconditions.checkStringNotEmpty;
 public final class ViewStack {
 
     public static final int SINGLE_VIEW = -1;
-    private final ParcelableIntStack stack = new ParcelableIntStack();
+
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
+    private final LayoutInflater inflater;
+
+    private final ParcelableIntStack stack = new ParcelableIntStack();
     private final List<StackChangedListener> listeners = new ArrayList<>();
-    private final PancakesViewInflater pancakesViewInflater;
 
     /**
-     * Static creation method for ViewStack instances
+     * Creates a new {@link ViewStack}
      *
-     * @param container Any {@link ViewGroup} container for navigation Views. Typically a
-     *                  FrameLayout
-     * @param delegate  A {@link ViewStackDelegate} responsible for "finishing" the navigation stack
+     * @param container      Any {@link ViewGroup} container for navigation Views.  Typically
+     *                       a FrameLayout
+     * @param delegate       A {@link ViewStackDelegate} responsible for "finishing" the
+     *                       navigation stack
      * @return A new ViewStack instance
      */
-    public static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
-        return create(container, delegate, new PancakesViewInflater() {
-            @Override
-            public View inflateView(@LayoutRes int layoutResource, ViewGroup container) {
-                return LayoutInflater.from(container.getContext())
-                        .inflate(layoutResource, container, false);
-            }
-        });
-    }
-
-    /**
-     * Package-private factory method which allows us to provide a custom
-     * {@link PancakesViewInflater} for testing.
-     *
-     * @param container            Any {@link ViewGroup} container for navigation Views.  Typically
-     *                             a FrameLayout
-     * @param delegate             A {@link ViewStackDelegate} responsible for "finishing" the
-     *                             navigation stack
-     * @param pancakesViewInflater A {@link PancakesViewInflater} which is responsible for inflating
-     *                             layout resources into the container.
-     * @return A new ViewStack instance
-     */
-    static ViewStack create(ViewGroup container, ViewStackDelegate delegate,
-                            PancakesViewInflater pancakesViewInflater) {
+    static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
         checkNotNull(container, "container == null");
         checkNotNull(delegate, "delegate == null");
-        return new ViewStack(container, delegate, pancakesViewInflater);
+        return new ViewStack(container, delegate);
     }
 
-    private ViewStack(ViewGroup container, ViewStackDelegate delegate,
-                      PancakesViewInflater inflater) {
+    private ViewStack(ViewGroup container, ViewStackDelegate delegate) {
         this.container = container;
         this.delegate = delegate;
-        this.pancakesViewInflater = inflater;
+        this.inflater = LayoutInflater.from(container.getContext());
     }
 
     /**
@@ -108,7 +87,7 @@ public final class ViewStack {
      * Pushes a View id onto the navigation stack and inflates it in the container
      *
      * @param layoutId The layout id to inflate into the parent {@link ViewGroup}.
-     * @return the provided layout id (to comply with the Java Stack API)
+     * @return the provided layout id
      */
     public int push(@LayoutRes int layoutId) {
         pushWithoutNotifyingListeners(layoutId);
@@ -118,8 +97,7 @@ public final class ViewStack {
 
     private void pushWithoutNotifyingListeners(@LayoutRes int layoutId) {
         stack.push(layoutId);
-        View view = pancakesViewInflater.inflateView(layoutId, container);
-        container.addView(view);
+        inflater.inflate(layoutId, container, true);
         setBelowViewVisibility(View.GONE);
     }
 
@@ -151,8 +129,7 @@ public final class ViewStack {
                                  final AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(layoutId);
-        View view = pancakesViewInflater.inflateView(layoutId, container);
-        container.addView(view);
+        View view = inflater.inflate(layoutId, container, true);
         notifyListeners();
         view.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(view) {
             @Override
@@ -246,14 +223,15 @@ public final class ViewStack {
         listeners.clear();
     }
 
-    private Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
+    // Animator listeners are package private so that animations can be "controlled" from tests
+    Animator.AnimatorListener pushAnimatorListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animator) {
             setBelowViewVisibility(View.GONE);
         }
     };
 
-    private Animator.AnimatorListener popAnimationListener = new AnimatorListenerAdapter() {
+    Animator.AnimatorListener popAnimationListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animator) {
             container.removeView(peekView());
