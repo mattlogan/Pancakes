@@ -33,10 +33,10 @@ public final class ViewStack {
     /**
      * Creates a new {@link ViewStack}
      *
-     * @param container      Any {@link ViewGroup} container for navigation Views.  Typically
-     *                       a FrameLayout
-     * @param delegate       A {@link ViewStackDelegate} responsible for "finishing" the
-     *                       navigation stack
+     * @param container Any {@link ViewGroup} container for navigation Views.  Typically
+     *                  a FrameLayout
+     * @param delegate  A {@link ViewStackDelegate} responsible for "finishing" the
+     *                  navigation stack
      * @return A new ViewStack instance
      */
     public static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
@@ -128,7 +128,7 @@ public final class ViewStack {
      * @return the provided layout id (to comply with the Java Stack API)
      */
     public View pushWithAnimation(@LayoutRes int layoutId,
-                                 final AnimatorFactory animatorFactory) {
+                                  final AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(layoutId);
         View pushed = inflater.inflate(layoutId, container, false);
