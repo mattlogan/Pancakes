@@ -173,6 +173,12 @@ public class ViewStackTest {
     }
 
     @Test
+    public void pushReturnsCorrectView() {
+        View view = viewStack.push(BOTTOM_LAYOUT_RES);
+        assertTrue(view instanceof TextView);
+    }
+
+    @Test
     public void pushFirstTime() {
         viewStack.push(BOTTOM_LAYOUT_RES);
 
@@ -202,6 +208,14 @@ public class ViewStackTest {
         } catch (NullPointerException e) {
             assertEquals("animatorFactory == null", e.getMessage());
         }
+    }
+
+    @Test
+    public void pushWithAnimationReturnsCorrectView() {
+        AnimatorFactory animatorFactory = AnimatorFactory.NONE;
+
+        View view = viewStack.pushWithAnimation(BOTTOM_LAYOUT_RES, animatorFactory);
+        assertTrue(view instanceof TextView);
     }
 
     @Test
