@@ -23,8 +23,6 @@ import static me.mattlogan.library.Preconditions.checkStringNotEmpty;
  */
 public final class ViewStack {
 
-    public static final int SINGLE_VIEW = -1;
-
     private final ViewGroup container;
     private final ViewStackDelegate delegate;
     private final LayoutInflater inflater;
@@ -41,7 +39,7 @@ public final class ViewStack {
      *                       navigation stack
      * @return A new ViewStack instance
      */
-    static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
+    public static ViewStack create(ViewGroup container, ViewStackDelegate delegate) {
         checkNotNull(container, "container == null");
         checkNotNull(delegate, "delegate == null");
         return new ViewStack(container, delegate);
