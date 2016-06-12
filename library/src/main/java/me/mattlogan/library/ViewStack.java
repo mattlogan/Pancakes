@@ -70,7 +70,6 @@ public final class ViewStack {
      * @param bundle A bundle containing saved ViewStack state
      * @param tag    The tag, or key, for which the ViewStack state was saved
      */
-    @SuppressWarnings("unchecked")
     public void rebuildFromBundle(Bundle bundle, String tag) {
         checkNotNull(bundle, "bundle == null");
         checkStringNotEmpty(tag, "tag is empty");
