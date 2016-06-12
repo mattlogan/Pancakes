@@ -96,7 +96,8 @@ public final class ViewStack {
 
     private View pushWithoutNotifyingListeners(@LayoutRes int layoutId) {
         stack.push(layoutId);
-        View pushed = inflater.inflate(layoutId, container, true);
+        View pushed = inflater.inflate(layoutId, container, false);
+        container.addView(pushed);
         setBelowViewVisibility(View.GONE);
         return pushed;
     }
@@ -130,7 +131,8 @@ public final class ViewStack {
                                  final AnimatorFactory animatorFactory) {
         checkNotNull(animatorFactory, "animatorFactory == null");
         stack.push(layoutId);
-        View pushed = inflater.inflate(layoutId, container, true);
+        View pushed = inflater.inflate(layoutId, container, false);
+        container.addView(pushed);
         notifyListeners();
         pushed.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(pushed) {
             @Override
