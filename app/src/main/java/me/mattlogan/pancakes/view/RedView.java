@@ -1,6 +1,7 @@
 package me.mattlogan.pancakes.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -68,5 +69,11 @@ public class RedView extends RelativeLayout {
     protected void onRestoreInstanceState(Parcelable savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d("testing", "RedView (" + hashCode() + ") onRestoreInstanceState");
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        Log.d("testing", "RedView (" + hashCode() + ") onDraw");
     }
 }

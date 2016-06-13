@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import me.mattlogan.library.StackChangedListener;
 import me.mattlogan.library.ViewStack;
 import me.mattlogan.library.ViewStackDelegate;
 
@@ -21,6 +22,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
+
+        viewStack.addStackChangedListener(new StackChangedListener() {
+            @Override public void onStackChanged() {
+                Log.d("testing", "MainActivity onStackChanged");
+            }
+        });
 
         if (savedInstanceState != null) {
             viewStack.rebuildFromBundle(savedInstanceState, STACK_TAG);
