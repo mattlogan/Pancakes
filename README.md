@@ -7,7 +7,7 @@ Download
 ----
 
 ```java
-compile 'me.mattlogan.pancakes:pancakes:3.1.0'
+compile 'me.mattlogan.pancakes:pancakes:4.0.0'
 ```
 
 Usage
@@ -16,24 +16,13 @@ Usage
 Create a `ViewStack` instance with a `ViewGroup` container and a `ViewStackDelegate`:
 
 ```java
-ViewStack viewStack = ViewStack.create(container, this);
+ViewStack viewStack = ViewStack.create(container, delegate);
 ```
 
-Create a `ViewFactory` for each `View`:
+Add a `View` to your container by pushing a layout id:
 
 ```java
-public class RedViewFactory implements ViewFactory {
-    @Override
-    public View createView(Context context, ViewGroup container) {
-        return LayoutInflater.from(context).inflate(R.layout.view_red, container, false);
-    }
-}
-```
-
-Add a `View` to your container by pushing a `ViewFactory`:
-
-```java
-viewStack.push(new RedViewFactory());
+viewStack.push(R.layout.red_view);
 ```
 
 Call `pop()` to go back one `View`:
@@ -42,7 +31,7 @@ Call `pop()` to go back one `View`:
 viewStack.pop();
 ```
 
-Or, use an `AnimatorFactory` along with `pushWithAnimation(ViewFactory, AnimatorFactory)` and `popWithAnimation(AnimatorFactory)` to add remove a `View` with a transition animation.
+Or, use an `AnimatorFactory` along with `pushWithAnimation(int, AnimatorFactory)` and `popWithAnimation(AnimatorFactory)` to add remove a `View` with a transition animation.
 
 ```java
 public class CircularReveal implements AnimatorFactory {
@@ -58,9 +47,9 @@ public class CircularReveal implements AnimatorFactory {
 }
 ```
 
-You can also call `peek()` and `peekView()` to get the `ViewFactory` and `View` at the top of the navigation stack.
+You can also call `peek()` to get the `View` at the top of the navigation stack.
 
-Add a `StackChangedListener` (or several!) if you want to be notified of changes in the navigation stack:
+Add a `StackChangedListener` (or several) if you want to be notified of changes in the navigation stack:
 
 ```java
 viewStack.addStackChangedListener(listener);
@@ -68,7 +57,7 @@ viewStack.addStackChangedListener(listener);
 
 You can also remove individual listeners with `removeStackChangedListener(StackChangedListener)` or remove all of them with `clearStackChangedListeners()`.
 
-Persist `ViewFactory` instances, in order, across configuration changes:
+Persist your navigation stack across configuration changes:
 
 ```java
 @Override
@@ -80,9 +69,7 @@ public void onSaveInstanceState(Bundle outState) {
 
 Rebuild the stack from a `Bundle`:
 ```java
-if (savedInstanceState != null) {
-    viewStack.rebuildFromBundle(savedInstanceState, STACK_TAG);
-}
+viewStack.rebuildFromBundle(savedInstanceState, STACK_TAG);
 ```
 
 Additionally, you may use `View.onSaveInstanceState(Bundle)` and `View.onRestoreInstanceState(Bundle)` to save the state of any `View` in the navigation stack so long as it has an ID.
@@ -97,14 +84,10 @@ public void finishStack() {
 
 See the [sample app](https://github.com/mattlogan/Pancakes/tree/master/app) for an example implementation.
 
-**Be careful: because `ViewFactory` instances are persisted across configuration changes,
-you should not keep references in a `ViewFactory` to any objects that should be garbage collected
-on a configuration change. Keep each `ViewFactory` as simple as possible.**
-
 Tests
 ----
 
-Unit tests located in [/library/src/test/](https://github.com/mattlogan/Pancakes/blob/master/library/src/test/java/me/mattlogan/library/ViewStackTest.java)
+Unit tests located in [/library/src/androidTest/](https://github.com/mattlogan/Pancakes/blob/master/library/src/androidTest/java/me/mattlogan/library/ViewStackTest.java)
 
 License
 -----
