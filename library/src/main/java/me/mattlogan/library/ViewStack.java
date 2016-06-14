@@ -78,7 +78,7 @@ public final class ViewStack {
         for (Integer layoutResource : savedStack) {
             pushWithoutNotifyingListeners(layoutResource);
         }
-        notifyListeners();
+        callOnViewAdded();
     }
 
     /**
@@ -89,7 +89,7 @@ public final class ViewStack {
      */
     public View push(@LayoutRes int layoutId) {
         View pushed = pushWithoutNotifyingListeners(layoutId);
-        notifyListeners();
+        callOnViewAdded();
         return pushed;
     }
 
@@ -113,7 +113,7 @@ public final class ViewStack {
         setBelowViewVisibility(View.VISIBLE);
         View popped = peek();
         container.removeView(popped);
-        notifyListeners();
+        callOnViewRemoved();
         return popped;
     }
 
@@ -132,7 +132,7 @@ public final class ViewStack {
         stack.push(layoutId);
         View pushed = inflater.inflate(layoutId, container, false);
         container.addView(pushed);
-        notifyListeners();
+        callOnViewAdded();
         pushed.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener(pushed) {
             @Override
             public void onFirstLayout(View view) {
@@ -186,7 +186,7 @@ public final class ViewStack {
     public void clear() {
         stack.clear();
         container.removeAllViews();
-        notifyListeners();
+        callOnViewRemoved();
     }
 
     /**
@@ -228,7 +228,7 @@ public final class ViewStack {
         @Override
         public void onAnimationEnd(Animator animator) {
             container.removeView(peek());
-            notifyListeners();
+            callOnViewRemoved();
         }
     };
 
@@ -256,9 +256,15 @@ public final class ViewStack {
         return true;
     }
 
-    private void notifyListeners() {
+    private void callOnViewAdded() {
         for (StackChangedListener listener : listeners) {
-            listener.onStackChanged();
+            listener.onViewAdded(peek());
+        }
+    }
+
+    private void callOnViewRemoved() {
+        for (StackChangedListener listener : listeners) {
+            listener.onViewRemoved();
         }
     }
 }

@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity
         viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
 
         viewStack.addStackChangedListener(new StackChangedListener() {
-            @Override public void onStackChanged() {
-                Log.d("testing", "MainActivity onStackChanged");
+            @Override public void onViewAdded() {
+                Log.d("testing", "MainActivity onViewAdded");
             }
         });
 

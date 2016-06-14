@@ -1,14 +1,20 @@
 package me.mattlogan.library;
 
+import android.view.View;
+
 /**
  * Listener interface for stack-changed events
  */
 public interface StackChangedListener {
     /**
-     * Called when BOTH the ViewStack's size AND the top View in the ViewGroup container have
-     * changed. For a push with an animation, this happens before the animation starts (right after
-     * the new View is added to the container). For a pop with an animation, this happens after the
-     * animation completes (right after the old view is removed from the container).
+     * Called when a View is added to the container
+     *
+     * @param view The added View
      */
-    void onStackChanged();
+    void onViewAdded(View view);
+
+    /**
+     * Called when a View is removed from the container
+     */
+    void onViewRemoved();
 }

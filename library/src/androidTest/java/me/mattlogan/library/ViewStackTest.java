@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -169,7 +170,7 @@ public class ViewStackTest {
         assertTopViewIsCorrectType();
         assertEquals(View.GONE, container.getChildAt(0).getVisibility());
         assertEquals(View.VISIBLE, container.getChildAt(1).getVisibility());
-        verifyStackChangedListenersNotified(1);
+        verifyOnViewAddedCalled(1);
     }
 
     @Test
@@ -184,7 +185,7 @@ public class ViewStackTest {
 
         assertNumberOfViews(1);
         assertBottomViewIsCorrectType();
-        verifyStackChangedListenersNotified(1);
+        verifyOnViewAddedCalled(1);
     }
 
     @Test
@@ -197,7 +198,7 @@ public class ViewStackTest {
         assertTopViewIsCorrectType();
         assertEquals(View.GONE, container.getChildAt(0).getVisibility());
         assertEquals(View.VISIBLE, container.getChildAt(1).getVisibility());
-        verifyStackChangedListenersNotified(2);
+        verifyOnViewAddedCalled(2);
     }
 
     @Test
@@ -228,7 +229,7 @@ public class ViewStackTest {
         assertNumberOfViews(1);
         assertBottomViewIsCorrectType();
 
-        verifyStackChangedListenersNotified(1);
+        verifyOnViewAddedCalled(1);
     }
 
     @Test
@@ -244,7 +245,7 @@ public class ViewStackTest {
         assertEquals(View.GONE, container.getChildAt(0).getVisibility());
         assertEquals(View.VISIBLE, container.getChildAt(1).getVisibility());
 
-        verifyStackChangedListenersNotified(2);
+        verifyOnViewAddedCalled(2);
     }
 
     @Test
@@ -275,7 +276,7 @@ public class ViewStackTest {
 
         assertNumberOfViews(1);
         assertBottomViewIsCorrectType();
-        verifyStackChangedListenersNotified(3);
+        verifyOnViewRemovedCalled(1);
     }
 
     @Test
@@ -286,7 +287,7 @@ public class ViewStackTest {
         viewStack.popWithAnimation(AnimatorFactory.NONE);
         viewStack.popAnimationListener.onAnimationEnd(null);
         assertNumberOfViews(1);
-        verifyStackChangedListenersNotified(3);
+        verifyOnViewRemovedCalled(1);
     }
 
     @Test
@@ -327,12 +328,18 @@ public class ViewStackTest {
 
         assertNumberOfViews(0);
 
-        verifyStackChangedListenersNotified(3);
+        verifyOnViewAddedCalled(2);
+        verifyOnViewRemovedCalled(1);
     }
 
-    private void verifyStackChangedListenersNotified(int times) {
-        verify(stackChangedListener1, times(times)).onStackChanged();
-        verify(stackChangedListener2, times(times)).onStackChanged();
+    private void verifyOnViewAddedCalled(int times) {
+        verify(stackChangedListener1, times(times)).onViewAdded(isA(View.class));
+        verify(stackChangedListener2, times(times)).onViewAdded(isA(View.class));
+    }
+
+    private void verifyOnViewRemovedCalled(int times) {
+        verify(stackChangedListener1, times(times)).onViewRemoved();
+        verify(stackChangedListener2, times(times)).onViewRemoved();
     }
 
     private void assertBottomViewIsCorrectType() {
