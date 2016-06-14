@@ -111,7 +111,7 @@ public final class ViewStack {
         if (!shouldPop()) return null;
         stack.pop();
         setBelowViewVisibility(View.VISIBLE);
-        View popped = peekView();
+        View popped = peek();
         container.removeView(popped);
         notifyListeners();
         return popped;
@@ -158,25 +158,15 @@ public final class ViewStack {
         if (!shouldPop()) return null;
         stack.pop();
         setBelowViewVisibility(View.VISIBLE);
-        View popped = peekView();
+        View popped = peek();
         startAnimation(animatorFactory, popped, popAnimationListener);
         return popped;
     }
 
     /**
-     * @return the layout id for the top view on the view stack
-     */
-    public int peek() {
-        if (size() == 0) {
-            throw new EmptyStackException();
-        }
-        return stack.peek();
-    }
-
-    /**
      * @return the View child at the top of the navigation stack
      */
-    public View peekView() {
+    public View peek() {
         if (size() == 0) {
             throw new EmptyStackException();
         }
@@ -237,7 +227,7 @@ public final class ViewStack {
     Animator.AnimatorListener popAnimationListener = new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animator) {
-            container.removeView(peekView());
+            container.removeView(peek());
             notifyListeners();
         }
     };

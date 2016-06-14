@@ -305,9 +305,9 @@ public class ViewStackTest {
 
         viewStack.push(TOP_LAYOUT_RES);
 
-        int result = viewStack.peek();
+        View view = viewStack.peek();
 
-        assertEquals(TOP_LAYOUT_RES, result);
+        assertTrue(view instanceof TwoLineListItem);
     }
 
     @Test
