@@ -5,9 +5,6 @@ import android.os.Parcelable;
 
 import java.util.Stack;
 
-/**
- * It's a normal Stack of ints.  Only Parcelable!
- */
 class ParcelableIntStack extends Stack<Integer> implements Parcelable {
 
     ParcelableIntStack() {

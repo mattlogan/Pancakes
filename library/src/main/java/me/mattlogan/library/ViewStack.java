@@ -31,11 +31,10 @@ public final class ViewStack {
     private final List<StackChangedListener> listeners = new ArrayList<>();
 
     /**
-     * Creates a new {@link ViewStack}
+     * Creates a new ViewStack
      *
-     * @param container Any {@link ViewGroup} container for navigation Views.  Typically
-     *                  a FrameLayout
-     * @param delegate  A {@link ViewStackDelegate} responsible for "finishing" the
+     * @param container Any ViewGroup container for navigation Views
+     * @param delegate  A ViewStackDelegate responsible for "finishing" the
      *                  navigation stack
      * @return A new ViewStack instance
      */
@@ -52,8 +51,7 @@ public final class ViewStack {
     }
 
     /**
-     * Saves the ViewStack state (an order list of view ids) to the provided Bundle using
-     * the provided tag
+     * Saves the ViewStack state to the provided Bundle using the provided tag
      *
      * @param bundle The Bundle in which to save the serialized Stack of view ids
      * @param tag    The tag, or "bundle key," for the stored data
@@ -65,7 +63,7 @@ public final class ViewStack {
     }
 
     /**
-     * Resets the navigation stack state to what it was when saveToBundle() was called.
+     * Resets the navigation stack state to what it was when saveToBundle() was called
      *
      * @param bundle A bundle containing saved ViewStack state
      * @param tag    The tag, or key, for which the ViewStack state was saved
@@ -82,10 +80,10 @@ public final class ViewStack {
     }
 
     /**
-     * Pushes a View id onto the navigation stack and inflates it in the container
+     * Inflates a View in the container and pushes it onto the navigation stack
      *
-     * @param layoutId The layout id to inflate into the parent {@link ViewGroup}.
-     * @return the provided layout id
+     * @param layoutId The layout id to inflate into the parent ViewGroup
+     * @return The inflated View
      */
     public View push(@LayoutRes int layoutId) {
         View pushed = pushWithoutNotifyingListeners(layoutId);
@@ -119,12 +117,12 @@ public final class ViewStack {
 
     /**
      * Pushes a View, created with the provided layout id, onto the navigation stack and animates
-     * it using the Animator created by the provided {@link AnimatorFactory}
+     * it using the Animator created by the provided AnimatorFactory
      *
      * @param layoutId        The id of the view to be added to the top of the navigation stack
-     * @param animatorFactory responsible for the creation of an Animator to animate the next View
+     * @param animatorFactory Responsible for the creation of an Animator to animate the next View
      *                        onto the navigation stack
-     * @return the provided layout id (to comply with the Java Stack API)
+     * @return The inflated View
      */
     public View pushWithAnimation(@LayoutRes int layoutId,
                                   final AnimatorFactory animatorFactory) {
@@ -148,7 +146,7 @@ public final class ViewStack {
      * Pops the top View off the navigation stack and animates it using the Animator created by the
      * provided AnimatorFactory
      *
-     * @param animatorFactory responsible for the creation of an Animator to animate the current
+     * @param animatorFactory Responsible for the creation of an Animator to animate the current
      *                        View off the navigation stack
      * @return The popped View from the top of the stack, or null if the top View is the last
      */
@@ -164,7 +162,7 @@ public final class ViewStack {
     }
 
     /**
-     * @return the View child at the top of the navigation stack
+     * @return The View child at the top of the navigation stack
      */
     public View peek() {
         if (size() == 0) {
@@ -174,7 +172,7 @@ public final class ViewStack {
     }
 
     /**
-     * @return the size of the navigation stack
+     * @return The size of the navigation stack
      */
     public int size() {
         return stack.size();
