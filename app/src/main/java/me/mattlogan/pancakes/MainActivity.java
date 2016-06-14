@@ -3,6 +3,7 @@ package me.mattlogan.pancakes;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import me.mattlogan.library.StackChangedListener;
@@ -24,8 +25,14 @@ public class MainActivity extends AppCompatActivity
         viewStack = ViewStack.create((ViewGroup) findViewById(R.id.container), this);
 
         viewStack.addStackChangedListener(new StackChangedListener() {
-            @Override public void onViewAdded() {
+            @Override
+            public void onViewAdded(View view) {
                 Log.d("testing", "MainActivity onViewAdded");
+            }
+
+            @Override
+            public void onViewRemoved() {
+                Log.d("testing", "MainActivity onViewRemoved");
             }
         });
 
