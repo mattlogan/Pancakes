@@ -15,8 +15,8 @@ class ParcelableIntStack extends Stack<Integer> implements Parcelable {
 
     private ParcelableIntStack(Parcel in) {
         int[] elements = in.createIntArray();
-        for (int i = elements.length; i >= 0; i--) {
-            push(elements[i]);
+        for (int element : elements) {
+            add(element);
         }
     }
 
@@ -40,12 +40,9 @@ class ParcelableIntStack extends Stack<Integer> implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         int[] elements = new int[size()];
-        int index = 0;
-        while (!isEmpty()) {
-            elements[index] = pop();
-            index++;
+        for (int i = 0; i < size(); i++) {
+            elements[i] = get(i);
         }
-
         dest.writeIntArray(elements);
     }
 }
