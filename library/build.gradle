@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'me.mattlogan.pancakes'
     PUBLISH_ARTIFACT_ID = 'pancakes'
-    PUBLISH_VERSION = '3.1.0'
+    PUBLISH_VERSION = '4.0.0'
 }
 
 android {
@@ -13,8 +13,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 4
-        versionName "3.1.0"
+        versionCode 5
+        versionName "4.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

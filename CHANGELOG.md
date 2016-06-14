@@ -26,3 +26,11 @@ Version 3.1.0 *10-19-2015*
 ----------------------------
 
 - Added `StackChangedListener` interface
+
+Version 4.0.0 *6-13-2016*
+----------------------------
+
+- Fixed `ClassCastException` in `rebuildFromBundle(Bundle)`
+- Changed API to accept layout id ints instead of `ViewFactory`s
+- Separated StackChangedListener into two methods: `onViewAdded(View)` and `onViewRemoved()`
+- Made push/pop/peek return Views
