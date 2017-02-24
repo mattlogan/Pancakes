@@ -1,4 +1,4 @@
-Deprecated
+Project Status
 ----
 
 There are a million other libraries for this use case, and I have no reason to believe this one is the best. This started as a fun experiment and got a bunch of github stars after it got shared through various channels. It works and you're free to use it, but I have no plans for maintaining or improving it.
