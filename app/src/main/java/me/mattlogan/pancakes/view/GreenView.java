@@ -28,6 +28,8 @@ public class GreenView extends RelativeLayout {
         super.onFinishInflate();
         Log.d("testing", "GreenView (" + hashCode() + ") onFinishInflate");
 
+        if (!(getContext() instanceof ViewStackActivity)) return;
+
         final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
         findViewById(R.id.green_button_back).setOnClickListener(new OnClickListener() {

@@ -25,6 +25,8 @@ public class RedView extends RelativeLayout {
         super.onFinishInflate();
         Log.d("testing", "RedView (" + hashCode() + ") onFinishInflate");
 
+        if (!(getContext() instanceof ViewStackActivity)) return;
+
         final ViewStack viewStack = ((ViewStackActivity) getContext()).viewStack();
 
         findViewById(R.id.red_button_back).setOnClickListener(new OnClickListener() {
